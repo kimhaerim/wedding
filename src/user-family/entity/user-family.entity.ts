@@ -1,16 +1,3 @@
-// user_family {
-// 	int id PK
-// 	int userId FK
-// 	enum parents "FATHER | MOTHER"
-// 	varchar name
-// 	boolean isDecease
-// 	varchar phoneNumber "NULL) 암호화"
-// 	varchar accountnummer "NULL) 암호화"
-// 	varchar bank "NULL) 은행명"
-// 	varhcar accountHolder "NULL) 예금주"
-// 	DATETIME createdAt
-// }
-
 import {
   Column,
   CreateDateColumn,
