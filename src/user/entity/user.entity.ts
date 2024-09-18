@@ -19,14 +19,14 @@ export class User {
   @Column('varchar', { length: 255 })
   email: string;
 
-  @Column('varchar', { length: 255 })
-  password: string;
+  @Column('varchar', { length: 255, nullable: true })
+  password?: string;
 
   @Column('varchar', { length: 255 })
   name: string;
 
-  @Column('datetime', { nullable: true })
-  birthday?: Date;
+  @Column('date', { nullable: true })
+  birthday?: string;
 
   @Column({ type: 'enum', enum: Gender })
   gender: Gender;
