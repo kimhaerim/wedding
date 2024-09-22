@@ -21,12 +21,6 @@ export class weddingInvitation {
   @Column('varchar', { length: 255 })
   description: string;
 
-  @Column('datetime', { nullable: true })
-  weddingDate?: Date;
-
-  @Column('date', { nullable: true })
-  coupleStartDate?: string;
-
   @Column('varchar', { length: 255, nullable: true })
   address?: string;
 
