@@ -1,1 +1,1 @@
-export * from './sign-up.args';
+export * from './user.output';

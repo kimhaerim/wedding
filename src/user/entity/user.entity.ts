@@ -16,6 +16,7 @@ export class User {
   @Column('int')
   coupleId: number;
 
+  @Index('email', { unique: true })
   @Column('varchar', { length: 255 })
   email: string;
 

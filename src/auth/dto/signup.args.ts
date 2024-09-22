@@ -1,5 +1,5 @@
 import { ArgsType, Field, Int } from '@nestjs/graphql';
-import { Gender } from '../enum';
+
 import {
   IsDate,
   IsDateString,
@@ -8,17 +8,13 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { Gender } from '../../user/enum';
 
 @ArgsType()
-export class SingUpArgs {
+export class SignupArgs {
   @IsEmail()
   @Field(() => String)
   email: string;
-
-  @IsOptional()
-  @IsInt()
-  @Field(() => Int, { nullable: true })
-  coupleId?: number;
 
   @IsString()
   @Field(() => String)
@@ -30,9 +26,24 @@ export class SingUpArgs {
 
   @IsOptional()
   @IsDateString()
-  @Field(() => Date, { nullable: true })
-  birthDay?: Date;
+  @Field({ nullable: true })
+  birthDay?: string;
 
   @Field(() => Gender)
   gender: Gender;
+
+  @IsOptional()
+  @IsInt()
+  @Field(() => Int, { nullable: true })
+  coupleId?: number;
+
+  @IsOptional()
+  @IsDate()
+  @Field(() => Date, { nullable: true })
+  weddingDate?: Date;
+
+  @IsOptional()
+  @IsDateString()
+  @Field({ nullable: true })
+  coupleStartDate?: string;
 }
