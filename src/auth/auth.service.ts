@@ -3,10 +3,14 @@ import { ISignup } from './interface';
 import { UserService } from '../user/user.service';
 import { Transactional } from 'typeorm-transactional';
 import { JwtService } from '@nestjs/jwt';
+import { CoupleService } from '../couple/couple.service';
 
 @Injectable()
 export class AuthService {
+  private readonly maxCoupleUserCount = 2;
+
   constructor(
+    private readonly coupleService: CoupleService,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
@@ -23,26 +27,49 @@ export class AuthService {
       this.validatePassword(password);
     }
 
-    if (!coupleId) {
-      // TODO. 커플 생성
+    if (coupleId) {
+      await this.verifyCouple(coupleId);
     }
 
-    const userId = await this.userService.addUser({
-      ...rest,
-      coupleId,
-      password,
-    });
+    const user = coupleId
+      ? await this.userService.addUser({ ...args, coupleId })
+      : await this.addUserWithCouple(args);
 
-    const payload = { userId, userName: rest.name };
+    const { accessToken, refreshToken } = this.signJwt(user.id, user.name);
+    return { userId: user.id, accessToken, refreshToken };
+  }
+
+  private async verifyCouple(coupleId: number) {
+    const couple = await this.coupleService.getCoupleById(coupleId);
+    if (!couple) {
+      throw new BadRequestException('커플이 존재하지 않습니다.');
+    }
+
+    const coupleUsers = await this.userService.getUsersByCoupleId(coupleId);
+    if (coupleUsers.length >= this.maxCoupleUserCount) {
+      throw new BadRequestException('이미 커플에 두 명의 사용자가 존재합니다.');
+    }
+  }
+
+  private async addUserWithCouple(args: ISignup) {
+    const couple = await this.coupleService.addCouple({
+      weddingDate: args.weddingDate,
+      coupleStartDate: args.coupleStartDate,
+    });
+    return this.userService.addUser({
+      ...args,
+      coupleId: couple.id,
+    });
+  }
+
+  private signJwt(userId: number, userName: string) {
+    const payload = { userId, userName };
     const accessToken = this.jwtService.signAsync(payload);
     const refreshToken = this.jwtService.sign(
       { ...payload, _refresh: true },
-      {
-        expiresIn: '365d',
-      },
+      { expiresIn: '365d' },
     );
-
-    return { userId, accessToken, refreshToken };
+    return { accessToken, refreshToken };
   }
 
   /**

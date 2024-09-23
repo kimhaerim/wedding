@@ -5,10 +5,12 @@ import { UserModule } from '../user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 
 import * as config from 'config';
+import { CoupleModule } from '../couple/couple.module';
 
 @Module({
   providers: [AuthResolver, AuthService],
   imports: [
+    CoupleModule,
     UserModule,
     JwtModule.register({
       global: true,

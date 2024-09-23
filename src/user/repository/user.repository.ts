@@ -10,7 +10,11 @@ export class UserRepository {
     return this.repository.findOneBy({ email });
   }
 
-  async add(args: IAdd) {
+  async getManyByCoupleId(coupleId: number) {
+    return this.repository.findBy({ coupleId });
+  }
+
+  async add(args: IAdd): Promise<User> {
     return this.repository.save(args);
   }
 }

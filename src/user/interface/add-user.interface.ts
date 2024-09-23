@@ -1,10 +1,6 @@
-import { Gender } from '../enum';
+import { User } from '../entity';
 
-export interface IAddUser {
-  email: string;
-  coupleId?: number;
-  password?: string;
-  name: string;
-  birthDay?: string;
-  gender: Gender;
-}
+export type IAddUser = Pick<
+  User,
+  'email' | 'coupleId' | 'password' | 'name' | 'birthday' | 'gender'
+>;

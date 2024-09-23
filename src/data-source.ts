@@ -14,6 +14,7 @@ const AppDataSource = new DataSource({
   migrations: [`${__dirname}/migrations/*{.ts,.js}`],
   migrationsRun: true,
   synchronize: true,
+  logging: ['schema', 'warn', 'query', 'error'],
 });
 
 AppDataSource.initialize()
