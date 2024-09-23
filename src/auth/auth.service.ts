@@ -2,16 +2,20 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { ISignup } from './interface';
 import { UserService } from '../user/user.service';
 import { Transactional } from 'typeorm-transactional';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   @Transactional()
   async signup(args: ISignup) {
     const { password, coupleId, ...rest } = args;
-    const userByEmail = await this.userService.getUserByEmail(rest.email);
-    if (userByEmail) {
+    const existsUser = await this.userService.getUserByEmail(rest.email);
+    if (existsUser) {
       throw new BadRequestException('이미 가입된 이메일입니다.');
     }
 
@@ -29,7 +33,16 @@ export class AuthService {
       password,
     });
 
-    return { userId, accessToken: '', refreshToken: '' };
+    const payload = { userId, userName: rest.name };
+    const accessToken = this.jwtService.signAsync(payload);
+    const refreshToken = this.jwtService.sign(
+      { ...payload, _refresh: true },
+      {
+        expiresIn: '365d',
+      },
+    );
+
+    return { userId, accessToken, refreshToken };
   }
 
   /**
