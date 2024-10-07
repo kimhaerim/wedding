@@ -1,9 +1,14 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ISignup } from './interface';
 import { UserService } from '../user/user.service';
 import { Transactional } from 'typeorm-transactional';
 import { JwtService } from '@nestjs/jwt';
 import { CoupleService } from '../couple/couple.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -14,6 +19,24 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
+
+  async login(email: string, password: string) {
+    const user = await this.userService.getUserByEmail(email);
+    if (!user) {
+      throw new NotFoundException('가입되지 않은 이메일입니다.');
+    }
+
+    if (!user.password) {
+      throw new BadRequestException('소셜로 가입한 계정입니다.');
+    }
+
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) {
+      throw new BadRequestException('비밀번호가 일치하지 않습니다.');
+    }
+
+    return this.signJwt(user.id, user.name);
+  }
 
   @Transactional()
   async signup(args: ISignup) {
