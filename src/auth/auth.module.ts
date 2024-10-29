@@ -6,9 +6,10 @@ import { JwtModule } from '@nestjs/jwt';
 
 import * as config from 'config';
 import { CoupleModule } from '../couple/couple.module';
+import { JwtStrategy } from '../common/guard/jwt.strategy';
 
 @Module({
-  providers: [AuthResolver, AuthService],
+  providers: [AuthResolver, AuthService, JwtStrategy],
   imports: [
     CoupleModule,
     UserModule,

@@ -9,6 +9,7 @@ import { Transactional } from 'typeorm-transactional';
 import { JwtService } from '@nestjs/jwt';
 import { CoupleService } from '../couple/couple.service';
 import * as bcrypt from 'bcrypt';
+import { Role } from '../common/enum';
 
 @Injectable()
 export class AuthService {
@@ -35,7 +36,7 @@ export class AuthService {
       throw new BadRequestException('비밀번호가 일치하지 않습니다.');
     }
 
-    return this.signJwt(user.id, user.name);
+    return this.signUserJwt(user.id);
   }
 
   @Transactional()
@@ -58,7 +59,7 @@ export class AuthService {
       ? await this.userService.addUser({ ...args, coupleId })
       : await this.addUserWithCouple(args);
 
-    const { accessToken, refreshToken } = this.signJwt(user.id, user.name);
+    const { accessToken, refreshToken } = this.signUserJwt(user.id);
     return { userId: user.id, accessToken, refreshToken };
   }
 
@@ -85,8 +86,8 @@ export class AuthService {
     });
   }
 
-  private signJwt(userId: number, userName: string) {
-    const payload = { userId, userName };
+  private signUserJwt(userId: number) {
+    const payload = { userId, _role: Role.USER };
     const accessToken = this.jwtService.signAsync(payload);
     const refreshToken = this.jwtService.sign(
       { ...payload, _refresh: true },
