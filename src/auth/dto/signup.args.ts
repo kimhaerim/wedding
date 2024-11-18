@@ -7,6 +7,7 @@ import {
   IsInt,
   IsOptional,
   IsString,
+  MaxLength,
   MinLength,
 } from 'class-validator';
 import { Gender } from '../../user/enum';
@@ -17,6 +18,7 @@ export class SignupArgs {
   @Field(() => String)
   email: string;
 
+  @MaxLength(8, { message: '비밀번호는 20자 이하여야 합니다.' })
   @MinLength(8, { message: '비밀번호는 8자 이상이어야 합니다.' })
   @IsString()
   @Field(() => String)

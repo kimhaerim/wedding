@@ -8,8 +8,8 @@ export class CoupleRepository {
     @InjectRepository(Couple) private repository: Repository<Couple>,
   ) {}
 
-  async getOneById(id: number): Promise<Couple> {
-    return this.repository.findOneBy({ id });
+  async getManyById(id: number): Promise<Couple[]> {
+    return this.repository.findBy({ id });
   }
 
   async add(args: IAddCouple): Promise<Couple> {

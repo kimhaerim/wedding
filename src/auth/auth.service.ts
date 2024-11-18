@@ -24,7 +24,9 @@ export class AuthService {
   async login(email: string, password: string) {
     const user = await this.userService.getUserByEmail(email);
     if (!user) {
-      throw new NotFoundException('가입되지 않은 이메일입니다.');
+      throw new NotFoundException(
+        '가입되지 않은 이메일입니다. 이메일 주소를 확인해주세요.',
+      );
     }
 
     if (!user.password) {

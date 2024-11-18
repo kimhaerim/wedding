@@ -1,9 +1,12 @@
-import { Field, Int } from '@nestjs/graphql';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { Gender } from '../enum';
 
+@ObjectType()
 export class UserOutput {
   @Field(() => Int)
   id: number;
+
+  coupleId: number;
 
   @Field()
   email: string;

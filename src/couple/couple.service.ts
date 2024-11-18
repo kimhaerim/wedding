@@ -8,7 +8,7 @@ export class CoupleService {
   constructor(private readonly coupleRepository: CoupleRepository) {}
 
   async getCoupleById(id: number) {
-    return this.coupleRepository.getOneById(id);
+    return this.coupleRepository.getManyById(id);
   }
 
   async addCouple(args: IAddCouple) {
