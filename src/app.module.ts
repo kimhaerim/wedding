@@ -1,23 +1,23 @@
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { UserModule } from './user/user.module';
+import { APP_GUARD } from '@nestjs/core';
+import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { addTransactionalDataSource } from 'typeorm-transactional';
 
-import { AppDataSource } from './data-source';
-import { CoupleModule } from './couple/couple.module';
-import { UserFamilyModule } from './user-family/user-family.module';
-import { WeddingInvitationModule } from './wedding-invitation/wedding-invitation.module';
+import { AppController } from './app.controller';
+import { AuthModule } from './auth/auth.module';
 import { CheckListModule } from './check-list/check-list.module';
+import { JwtAuthGuard } from './common/guard/jwt-auth.guard';
+import { CoupleModule } from './couple/couple.module';
+import { AppDataSource } from './data-source';
 import { FileModule } from './file/file.module';
+import { UserModule } from './user/user.module';
+import { UserFamilyModule } from './user-family/user-family.module';
 import { WeddingAttendModule } from './wedding-attend/wedding-attend.module';
 import { WeddingChatModule } from './wedding-chat/wedding-chat.module';
-import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { addTransactionalDataSource } from 'typeorm-transactional';
-import { DataSource } from 'typeorm';
-import { AuthModule } from './auth/auth.module';
-import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './common/guard/jwt-auth.guard';
+import { WeddingInvitationModule } from './wedding-invitation/wedding-invitation.module';
 
 @Module({
   imports: [

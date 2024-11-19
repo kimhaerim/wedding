@@ -8,6 +8,7 @@ module.exports = {
     'import/parsers': { '@typescript-eslint/parser': ['.ts'] },
   },
   plugins: [
+    'import',
     '@typescript-eslint/eslint-plugin',
     'unused-imports',
     'sort-class-members',
@@ -18,6 +19,9 @@ module.exports = {
     'plugin:import/recommended',
     'plugin:prettier/recommended',
     'plugin:promise/recommended',
+    'eslint:recommended',
+    'plugin:import/errors',
+    'plugin:import/warnings',
   ],
   root: true,
   env: {
@@ -76,6 +80,13 @@ module.exports = {
       'error',
       { blankLine: 'always', prev: 'block-like', next: '*' },
     ],
+    'no-unused-vars': [
+      'warn',
+      {
+        varsIgnorePattern: '^_',
+        argsIgnorePattern: '^_',
+      },
+    ],
   },
   overrides: [
     {
@@ -86,9 +97,24 @@ module.exports = {
         'sort-class-members/sort-class-members': [
           'error',
           {
-            order: ['[properties]'],
+            order: [
+              '[static-properties]',
+              '[static-methods]',
+              '[properties]',
+              'constructor',
+              '[methods]',
+            ],
             groups: {
-              properties: [{ type: 'property', sort: 'alphabetical' }],
+              'static-properties': [
+                { static: true, propertyType: 'PropertyDefinition' },
+              ],
+              'static-methods': [
+                { static: true, propertyType: 'MethodDefinition' },
+              ],
+              properties: [
+                { static: false, propertyType: 'PropertyDefinition' },
+              ],
+              methods: [{ static: false, propertyType: 'MethodDefinition' }],
             },
           },
         ],

@@ -1,11 +1,18 @@
-import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { IdArgs } from 'src/common/dto';
+import {
+  Args,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
+
+import { UpdateUserProfileArgs, UserOutput } from './dto';
 import { UserService } from './user.service';
-import { Roles } from 'src/common/guard/roles.decorator';
-import { Role } from 'src/common/enum';
-import { RequestUser } from 'src/common/guard/request-user';
-import { IRequestUser } from 'src/common/interface';
-import { UserOutput } from './dto';
+import { Role } from '../common/enum';
+import { RequestUser } from '../common/guard/request-user';
+import { Roles } from '../common/guard/roles.decorator';
+import { IRequestUser } from '../common/interface';
 
 @Resolver(UserOutput)
 export class UserResolver {
@@ -15,6 +22,15 @@ export class UserResolver {
   @Query(() => UserOutput, { description: '사용자 단일 조회' })
   async user(@RequestUser() req: IRequestUser) {
     return this.userService.getUserById(req.userId);
+  }
+
+  @Roles(Role.USER)
+  @Mutation(() => Boolean, { description: '프로필 수정' })
+  async updateUserProfile(
+    @Args() args: UpdateUserProfileArgs,
+    @RequestUser() req: IRequestUser,
+  ) {
+    return this.userService.updateUserProfile({ ...args, id: req.userId });
   }
 
   @ResolveField(() => UserOutput, {

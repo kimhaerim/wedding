@@ -3,13 +3,14 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { ISignup } from './interface';
-import { UserService } from '../user/user.service';
-import { Transactional } from 'typeorm-transactional';
 import { JwtService } from '@nestjs/jwt';
-import { CoupleService } from '../couple/couple.service';
 import * as bcrypt from 'bcrypt';
+import { Transactional } from 'typeorm-transactional';
+
+import { ISignup } from './interface';
 import { Role } from '../common/enum';
+import { CoupleService } from '../couple/couple.service';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService {

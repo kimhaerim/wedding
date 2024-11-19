@@ -1,4 +1,5 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
+
 import { Gender } from '../enum';
 
 @ObjectType()
@@ -14,8 +15,8 @@ export class UserOutput {
   @Field()
   name: string;
 
-  @Field(() => Date, { nullable: true })
-  birthday?: Date;
+  @Field(() => String, { nullable: true })
+  birthday?: string;
 
   @Field(() => Gender)
   gender: Gender;

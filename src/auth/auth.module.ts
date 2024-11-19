@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import * as config from 'config';
+
 import { AuthResolver } from './auth.resolver';
 import { AuthService } from './auth.service';
-import { UserModule } from '../user/user.module';
-import { JwtModule } from '@nestjs/jwt';
-
-import * as config from 'config';
-import { CoupleModule } from '../couple/couple.module';
 import { JwtStrategy } from '../common/guard/jwt.strategy';
+import { CoupleModule } from '../couple/couple.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
   providers: [AuthResolver, AuthService, JwtStrategy],

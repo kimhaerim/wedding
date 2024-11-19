@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
-import { CoupleService } from './couple.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
+import { CoupleService } from './couple.service';
 import { Couple } from './entity';
 import { CoupleRepository } from './repository';
 

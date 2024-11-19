@@ -36,4 +36,4 @@ lerna-debug.log*
 
 src/data-source.ts
 
-config/local.js
+config

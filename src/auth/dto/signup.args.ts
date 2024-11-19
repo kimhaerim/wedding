@@ -1,5 +1,4 @@
 import { ArgsType, Field, Int } from '@nestjs/graphql';
-
 import {
   IsDate,
   IsDateString,
@@ -10,6 +9,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+
 import { Gender } from '../../user/enum';
 
 @ArgsType()

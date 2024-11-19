@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+
 import { CoupleService } from './couple.service';
 
 describe('CoupleService', () => {

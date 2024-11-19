@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
+
+import { IAddCouple, IUpdateCouple } from './interface';
 import { CoupleRepository } from './repository';
-import { Couple } from './entity';
-import { IAddCouple } from './interface';
+import { filterValidFields } from '../common/util';
 
 @Injectable()
 export class CoupleService {
@@ -13,5 +14,15 @@ export class CoupleService {
 
   async addCouple(args: IAddCouple) {
     return this.coupleRepository.add(args);
+  }
+
+  async updateCouple(args: IUpdateCouple) {
+    const { id, ...updateArgs } = args;
+    const updateData = filterValidFields(updateArgs);
+    if (Object.keys(updateData).length === 0) {
+      return true;
+    }
+
+    return this.coupleRepository.updateById(id, updateData);
   }
 }

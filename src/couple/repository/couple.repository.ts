@@ -1,6 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { Couple } from '../entity';
 import { Repository } from 'typeorm';
+
+import { Couple } from '../entity';
 import { IAddCouple } from '../interface';
 
 export class CoupleRepository {
@@ -14,5 +15,12 @@ export class CoupleRepository {
 
   async add(args: IAddCouple): Promise<Couple> {
     return this.repository.save(args);
+  }
+
+  async updateById(
+    id: number,
+    args: { weddingDate?: Date; coupleStartDate?: string },
+  ) {
+    return this.repository.update(id, args);
   }
 }
