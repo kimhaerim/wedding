@@ -18,6 +18,7 @@ import { UserFamilyModule } from './user-family/user-family.module';
 import { WeddingAttendModule } from './wedding-attend/wedding-attend.module';
 import { WeddingChatModule } from './wedding-chat/wedding-chat.module';
 import { WeddingInvitationModule } from './wedding-invitation/wedding-invitation.module';
+import { TransactionModule } from './transaction/transaction.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { WeddingInvitationModule } from './wedding-invitation/wedding-invitation
     WeddingAttendModule,
     WeddingChatModule,
     WeddingInvitationModule,
+    TransactionModule,
   ],
   controllers: [AppController],
   providers: [

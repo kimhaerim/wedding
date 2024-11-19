@@ -5,6 +5,7 @@ import {
   Index,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { CheckListStatus } from '../enum';
 
 @Entity()
 export class CheckList {
@@ -26,6 +27,9 @@ export class CheckList {
 
   @Column('varchar', { length: 255, nullable: true })
   memo?: string;
+
+  @Column('enum', { enum: CheckListStatus, nullable: true })
+  status?: CheckListStatus;
 
   @CreateDateColumn()
   createdAt: Date;

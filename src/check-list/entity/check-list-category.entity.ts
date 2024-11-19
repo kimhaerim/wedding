@@ -18,6 +18,9 @@ export class CheckListCategory {
   @Column('varchar', { length: 255 })
   category: string;
 
+  @Column('int')
+  budgetAmount: number;
+
   @CreateDateColumn()
   createdAt: Date;
 }
