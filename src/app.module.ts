@@ -8,8 +8,10 @@ import { addTransactionalDataSource } from 'typeorm-transactional';
 
 import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
+import { CategoryModule } from './category/category.module';
 import { CheckListModule } from './check-list/check-list.module';
 import { JwtAuthGuard } from './common/guard/jwt-auth.guard';
+import { CostModule } from './cost/cost.module';
 import { CoupleModule } from './couple/couple.module';
 import { AppDataSource } from './data-source';
 import { FileModule } from './file/file.module';
@@ -18,7 +20,6 @@ import { UserFamilyModule } from './user-family/user-family.module';
 import { WeddingAttendModule } from './wedding-attend/wedding-attend.module';
 import { WeddingChatModule } from './wedding-chat/wedding-chat.module';
 import { WeddingInvitationModule } from './wedding-invitation/wedding-invitation.module';
-import { TransactionModule } from './transaction/transaction.module';
 
 @Module({
   imports: [
@@ -42,7 +43,9 @@ import { TransactionModule } from './transaction/transaction.module';
       },
     }),
     AuthModule,
+    CategoryModule,
     CheckListModule,
+    CostModule,
     CoupleModule,
     FileModule,
     UserModule,
@@ -50,7 +53,6 @@ import { TransactionModule } from './transaction/transaction.module';
     WeddingAttendModule,
     WeddingChatModule,
     WeddingInvitationModule,
-    TransactionModule,
   ],
   controllers: [AppController],
   providers: [

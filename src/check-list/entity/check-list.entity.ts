@@ -5,6 +5,7 @@ import {
   Index,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+
 import { CheckListStatus } from '../enum';
 
 @Entity()
@@ -12,9 +13,13 @@ export class CheckList {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Index('checkListCategoryId')
+  @Index('coupleId')
   @Column('int')
-  checkListCategoryId: number;
+  coupleId: number;
+
+  @Index('categoryId')
+  @Column('int', { nullable: true })
+  categoryId?: number;
 
   @Column('varchar', { length: 255 })
   description: string;

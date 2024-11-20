@@ -1,7 +1,7 @@
 module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: 'tsconfig.json',
+    project: './tsconfig.json',
     sourceType: 'module',
   },
   settings: {
@@ -28,7 +28,7 @@ module.exports = {
     node: true,
     jest: true,
   },
-  ignorePatterns: ['.eslintrc.js', 'data-source.ts'],
+  ignorePatterns: ['.eslintrc.js', 'data-source.ts', 'test/**/*.ts'],
   rules: {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',

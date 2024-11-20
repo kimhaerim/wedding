@@ -4,10 +4,12 @@ import {
   Entity,
   Index,
   PrimaryGeneratedColumn,
+  Unique,
 } from 'typeorm';
 
+@Unique('title_couple_id', ['title', 'coupleId'])
 @Entity()
-export class CheckListCategory {
+export class Category {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -16,9 +18,9 @@ export class CheckListCategory {
   coupleId: number;
 
   @Column('varchar', { length: 255 })
-  category: string;
+  title: string;
 
-  @Column('int')
+  @Column('int', { default: 0 })
   budgetAmount: number;
 
   @CreateDateColumn()

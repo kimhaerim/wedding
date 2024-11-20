@@ -5,19 +5,20 @@ import {
   Index,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { CostType } from '../enum';
+
+import { CostType } from '../../transaction/enum';
 
 @Entity()
-export class Transaction {
+export class Cost {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Index('checkListId')
+  @Index('categoryId')
   @Column('int')
-  checkListId: number;
+  categoryId: number;
 
   @Column('int')
-  cost: number;
+  amount: number;
 
   @Column('date', { nullable: true })
   paymentDate?: Date;
