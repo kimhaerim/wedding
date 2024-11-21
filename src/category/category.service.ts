@@ -16,40 +16,30 @@ export class CategoryService {
     private readonly categoryRepository: CategoryRepository,
   ) {}
 
-  async getCategory(id: number, userId: number) {
-    const user = await this.userService.getUserById(userId);
+  async getCategory(id: number, coupleId: number) {
     const category = await this.categoryRepository.getOneById(id);
-    if (category.coupleId !== user.coupleId) {
+    if (category.coupleId !== coupleId) {
       throw new ForbiddenException('조회 권한이 없는 카테고리입니다.');
     }
 
     return category;
   }
 
-  async getCategories(userId: number) {
-    const user = await this.userService.getUserById(userId);
-    return this.categoryRepository.getManyByCoupleId(user.coupleId);
+  async getCategories(coupleId: number) {
+    return this.categoryRepository.getManyByCoupleId(coupleId);
   }
 
   @Transactional()
   async addCategory(args: IAddCategory) {
-    const { userId, title, budgetAmount } = args;
-    const user = await this.userService.getUserById(userId);
-    const checkListCategory =
-      await this.categoryRepository.getOneByCategoryAndCoupleId(
-        title,
-        user.coupleId,
-      );
-    if (checkListCategory) {
+    const category = await this.categoryRepository.getOneByTitleAndCoupleId(
+      args.title,
+      args.coupleId,
+    );
+    if (category) {
       throw new BadRequestException('이미 추가된 카테고리입니다.');
     }
 
-    await this.categoryRepository.add({
-      title,
-      coupleId: user.coupleId,
-      budgetAmount,
-    });
-
+    await this.categoryRepository.add(args);
     return true;
   }
 }

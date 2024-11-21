@@ -39,7 +39,7 @@ export class AuthService {
       throw new BadRequestException('비밀번호가 일치하지 않습니다.');
     }
 
-    return this.signUserJwt(user.id);
+    return this.signUserJwt(user.id, user.coupleId);
   }
 
   @Transactional()
@@ -62,7 +62,10 @@ export class AuthService {
       ? await this.userService.addUser({ ...args, coupleId })
       : await this.addUserWithCouple(args);
 
-    const { accessToken, refreshToken } = this.signUserJwt(user.id);
+    const { accessToken, refreshToken } = this.signUserJwt(
+      user.id,
+      user.coupleId,
+    );
     return { userId: user.id, accessToken, refreshToken };
   }
 
@@ -89,8 +92,8 @@ export class AuthService {
     });
   }
 
-  private signUserJwt(userId: number) {
-    const payload = { userId, _role: Role.USER };
+  private signUserJwt(userId: number, coupleId: number) {
+    const payload = { userId, coupleId, _role: Role.USER };
     const accessToken = this.jwtService.signAsync(payload);
     const refreshToken = this.jwtService.sign(
       { ...payload, _refresh: true },

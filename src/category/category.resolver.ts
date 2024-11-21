@@ -15,13 +15,13 @@ export class CategoryResolver {
   @Roles(Role.USER)
   @Query(() => CategoryOutput, { description: '카테고리 단일 조회' })
   async category(@Args() args: IdArgs, @RequestUser() req: IRequestUser) {
-    return this.categoryService.getCategory(args.id, req.userId);
+    return this.categoryService.getCategory(args.id, req.coupleId);
   }
 
   @Roles(Role.USER)
   @Query(() => [CategoryOutput], { description: '카테고리 목록 조회' })
   async categories(@RequestUser() req: IRequestUser) {
-    return this.categoryService.getCategories(req.userId);
+    return this.categoryService.getCategories(req.coupleId);
   }
 
   @Roles(Role.USER)
@@ -32,7 +32,7 @@ export class CategoryResolver {
   ) {
     return this.categoryService.addCategory({
       ...args,
-      userId: req.userId,
+      coupleId: req.coupleId,
     });
   }
 }

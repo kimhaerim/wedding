@@ -1,5 +1,5 @@
 export interface IAddCategory {
-  userId: number;
+  coupleId: number;
   title: string;
   budgetAmount?: number;
 }

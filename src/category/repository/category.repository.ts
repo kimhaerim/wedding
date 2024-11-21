@@ -13,7 +13,7 @@ export class CategoryRepository {
     return this.repository.findOneBy({ id });
   }
 
-  async getOneByCategoryAndCoupleId(title: string, coupleId: number) {
+  async getOneByTitleAndCoupleId(title: string, coupleId: number) {
     return this.repository.findOneBy({ title, coupleId });
   }
 
