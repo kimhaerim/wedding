@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { Transactional } from 'typeorm-transactional';
 
 import { IAddCategory } from './interface';
@@ -11,6 +15,21 @@ export class CategoryService {
     private readonly userService: UserService,
     private readonly categoryRepository: CategoryRepository,
   ) {}
+
+  async getCategory(id: number, userId: number) {
+    const user = await this.userService.getUserById(userId);
+    const category = await this.categoryRepository.getOneById(id);
+    if (category.coupleId !== user.coupleId) {
+      throw new ForbiddenException('조회 권한이 없는 카테고리입니다.');
+    }
+
+    return category;
+  }
+
+  async getCategories(userId: number) {
+    const user = await this.userService.getUserById(userId);
+    return this.categoryRepository.getManyByCoupleId(user.coupleId);
+  }
 
   @Transactional()
   async addCategory(args: IAddCategory) {
@@ -25,10 +44,12 @@ export class CategoryService {
       throw new BadRequestException('이미 추가된 카테고리입니다.');
     }
 
-    return this.categoryRepository.add({
+    await this.categoryRepository.add({
       title,
       coupleId: user.coupleId,
       budgetAmount,
     });
+
+    return true;
   }
 }

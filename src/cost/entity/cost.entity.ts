@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-import { CostType } from '../../transaction/enum';
+import { CostType } from '../enum';
 
 @Entity()
 export class Cost {

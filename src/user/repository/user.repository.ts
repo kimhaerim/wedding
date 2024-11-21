@@ -2,8 +2,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { User } from '../entity';
-import { IAdd } from './interface';
-import { Gender } from '../enum';
+import { IAdd, IUpdateById } from './interface';
 
 export class UserRepository {
   constructor(@InjectRepository(User) private repository: Repository<User>) {}
@@ -24,10 +23,7 @@ export class UserRepository {
     return this.repository.save(args);
   }
 
-  async updateById(
-    id: number,
-    args: { name?: string; birthday?: string; gender?: Gender },
-  ) {
+  async updateById(id: number, args: IUpdateById) {
     return this.repository.update(id, args);
   }
 }
