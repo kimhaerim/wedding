@@ -23,7 +23,8 @@ export class UserRepository {
     return this.repository.save(args);
   }
 
-  async updateById(id: number, args: IUpdateById) {
-    return this.repository.update(id, args);
+  async updateById(id: number, updateArgs: IUpdateById) {
+    const updateResult = await this.repository.update(id, updateArgs);
+    return updateResult.affected > 0 ? true : false;
   }
 }
