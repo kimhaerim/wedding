@@ -1,10 +1,14 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import * as dayjs from 'dayjs';
 
 import { CheckList } from './entity';
 import {
   IAddCheckList,
   ICheckListOutput,
+  IDailyCheckListsByMonthOutput,
+  IGetCheckListCount,
   IGetCheckLists,
+  IGetDailyCheckListsByMonth,
   IUpdateCategoryIdForCheckLists,
   IUpdateCheckList,
 } from './interface';
@@ -37,6 +41,51 @@ export class CheckListService {
 
   private convertCheckListToOutput(checkList: CheckList): ICheckListOutput {
     return { ...checkList, isCompleted: checkList.completedAt ? true : false };
+  }
+
+  async getDailyCheckListsByMonth(args: IGetDailyCheckListsByMonth) {
+    const dateRange = this.getDateRange(args.targetYear, args.targetMonth);
+    const checkLists = await this.checkListRepository.getMany({
+      ...args,
+      ...dateRange,
+    });
+
+    const convertedCheckLists = checkLists.map((checkList) =>
+      this.convertCheckListToOutput(checkList),
+    );
+
+    return convertedCheckLists.reduce(
+      (acc: IDailyCheckListsByMonthOutput[], checkList: ICheckListOutput) => {
+        const reservedDate = dayjs(checkList.reservedDate).format('YYYY-MM-DD');
+
+        const found = acc.find((data) => data.reservedDate === reservedDate);
+        if (found) {
+          found.checkLists.push(checkList);
+        } else {
+          acc.push({ reservedDate, checkLists: [checkList] });
+        }
+
+        return acc;
+      },
+      [],
+    );
+  }
+
+  async getCheckListCount(args: IGetCheckListCount) {
+    const { targetYear, targetMonth, coupleId } = args;
+    const dateRange = this.getDateRange(targetYear, targetMonth);
+    return this.checkListRepository.getCount({ ...dateRange, coupleId });
+  }
+
+  private getDateRange(targetYear?: number, targetMonth?: number) {
+    if (!targetYear || !targetMonth) {
+      return { startDate: undefined, endDate: undefined };
+    }
+
+    const format = 'YYYY-MM-DD';
+    const startDate = dayjs(`${targetYear}-${targetMonth}-1`).format(format);
+    const endDate = dayjs(`${targetYear}-${targetMonth + 1}-1`).format(format);
+    return { startDate, endDate };
   }
 
   async addCheckList(args: IAddCheckList) {

@@ -3,8 +3,12 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CheckListService } from './check-list.service';
 import {
   AddCheckListArgs,
+  CheckListCountArgs,
+  CheckListCountOutput,
   CheckListOutput,
   CheckListsArgs,
+  DailyCheckListByMonthArgs,
+  DailyCheckListByMonthOutput,
   LinkChecklistsToCategoryArgs,
   RemoveCheckListsByCategoryIdArgs,
   UpdateCheckListArgs,
@@ -32,6 +36,32 @@ export class CheckListResolver {
     @RequestUser() req: IRequestUser,
   ) {
     return this.checkListService.getCheckLists({
+      ...args,
+      coupleId: req.coupleId,
+    });
+  }
+
+  @Roles(Role.USER)
+  @Query(() => [DailyCheckListByMonthOutput], {
+    description: '날짜 별로 체크리스트 목록 조회',
+  })
+  async dailyCheckListByMonth(
+    @Args() args: DailyCheckListByMonthArgs,
+    @RequestUser() req: IRequestUser,
+  ) {
+    return this.checkListService.getDailyCheckListsByMonth({
+      ...args,
+      coupleId: req.coupleId,
+    });
+  }
+
+  @Roles(Role.USER)
+  @Query(() => CheckListCountOutput, { description: '체크리스트 개수 조회' })
+  async checkListCount(
+    @Args() args: CheckListCountArgs,
+    @RequestUser() req: IRequestUser,
+  ) {
+    return this.checkListService.getCheckListCount({
       ...args,
       coupleId: req.coupleId,
     });

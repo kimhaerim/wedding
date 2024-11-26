@@ -38,6 +38,7 @@
     "bcrypt": "^5.1.1",
     "class-validator": "^0.14.1",
     "config": "^3.3.12",
+    "dayjs": "^1.11.13",
     "graphql": "^16.9.0",
     "mysql2": "^3.11.2",
     "node": "^22.8.0",

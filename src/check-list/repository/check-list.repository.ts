@@ -2,7 +2,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 
 import { CheckList } from '../entity';
-import { IAdd, IGetMany, IUpdateById } from './interface';
+import {
+  IAdd,
+  IApplyOrderBy,
+  IGetCount,
+  IGetMany,
+  IUpdateById,
+} from './interface';
+import { OrderOption } from '../../common/enum';
+import { CheckListOrderBy } from '../enum';
 
 export class CheckListRepository {
   constructor(
@@ -22,17 +30,71 @@ export class CheckListRepository {
   }
 
   async getMany(args: IGetMany) {
-    const { coupleId, isCompleted } = args;
-    const builder = this.repository
-      .createQueryBuilder('checkList')
-      .where('checkList.coupleId = :coupleId', { coupleId });
+    const { coupleId, isCompleted, startDate, endDate, orderBy, orderOption } =
+      args;
+    const builder = this.createBaseQuery(coupleId);
 
     if (isCompleted !== undefined) {
       const condition = isCompleted ? 'IS NOT NULL' : 'IS NULL';
       builder.andWhere(`checkList.completedAt ${condition}`);
     }
 
+    if (startDate && endDate) {
+      builder
+        .andWhere('checkList.reservedDate >= :startDate', { startDate })
+        .andWhere('checkList.reservedDate < :endDate', { endDate });
+    }
+
+    if (orderBy && orderOption) {
+      builder.orderBy('checkList.reservedDate', OrderOption.ASC);
+      this.applyOrderBy({ builder, orderBy, orderOption });
+    }
+
     return builder.getMany();
+  }
+
+  private applyOrderBy(args: IApplyOrderBy) {
+    const { builder, orderBy, orderOption } = args;
+    switch (orderBy) {
+      case CheckListOrderBy.CREATED_AT:
+        builder.addOrderBy('checkList.id', orderOption);
+        break;
+
+      case CheckListOrderBy.COMPLETED_AT:
+        builder.addOrderBy('checkList.completedAt', orderOption);
+        break;
+    }
+
+    return builder;
+  }
+
+  async getCount(args: IGetCount) {
+    const { startDate, endDate, coupleId } = args;
+    const builder = this.createBaseQuery(coupleId);
+
+    builder.select(
+      'COUNT(*) AS totalCount, COUNT(CASE WHEN checkList.completedAt IS NULL THEN 1 END) AS incompleteCount, COUNT(CASE WHEN checkList.completedAt IS NOT NULL THEN 1 END) AS completedCount',
+    );
+
+    if (startDate && endDate) {
+      builder
+        .andWhere('checkList.reservedDate >= :startDate', { startDate })
+        .andWhere('checkList.reservedDate < :endDate', { endDate });
+      builder.groupBy('DATE_FORMAT(checkList.reservedDate, "%Y-%m")');
+    }
+
+    const result = await builder.getRawOne();
+    return {
+      totalCount: +result.totalCount,
+      completedCount: +result.completedCount,
+      incompleteCount: +result.incompleteCount,
+    };
+  }
+
+  private createBaseQuery(coupleId: number) {
+    return this.repository
+      .createQueryBuilder('checkList')
+      .where('checkList.coupleId = :coupleId', { coupleId });
   }
 
   async add(args: IAdd) {
