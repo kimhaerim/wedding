@@ -5,6 +5,7 @@ import {
   AddCheckListArgs,
   CheckListOutput,
   CheckListsArgs,
+  LinkChecklistsToCategoryArgs,
   UpdateCheckListArgs,
 } from './dto';
 import { IdArgs } from '../common/dto';
@@ -54,6 +55,18 @@ export class CheckListResolver {
     @RequestUser() req: IRequestUser,
   ) {
     return this.checkListService.updateCheckList({
+      ...args,
+      coupleId: req.coupleId,
+    });
+  }
+
+  @Roles(Role.USER)
+  @Mutation(() => Boolean, { description: '체크리스트를 카테고리와 연결하기' })
+  async linkChecklistsToCategory(
+    @Args() args: LinkChecklistsToCategoryArgs,
+    @RequestUser() req: IRequestUser,
+  ) {
+    return this.checkListService.updateCategoryIdForCheckLists({
       ...args,
       coupleId: req.coupleId,
     });

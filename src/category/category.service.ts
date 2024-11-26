@@ -7,14 +7,10 @@ import { Transactional } from 'typeorm-transactional';
 
 import { IAddCategory } from './interface';
 import { CategoryRepository } from './repository';
-import { UserService } from '../user/user.service';
 
 @Injectable()
 export class CategoryService {
-  constructor(
-    private readonly userService: UserService,
-    private readonly categoryRepository: CategoryRepository,
-  ) {}
+  constructor(private readonly categoryRepository: CategoryRepository) {}
 
   async getCategory(id: number, coupleId: number) {
     const category = await this.categoryRepository.getOneById(id);

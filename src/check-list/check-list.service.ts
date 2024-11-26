@@ -5,14 +5,19 @@ import {
   IAddCheckList,
   ICheckListOutput,
   IGetCheckLists,
+  IUpdateCategoryIdForCheckLists,
   IUpdateCheckList,
 } from './interface';
 import { CheckListRepository } from './repository';
+import { CategoryService } from '../category/category.service';
 import { filterValidFields } from '../common/util';
 
 @Injectable()
 export class CheckListService {
-  constructor(private readonly checkListRepository: CheckListRepository) {}
+  constructor(
+    private readonly categoryService: CategoryService,
+    private readonly checkListRepository: CheckListRepository,
+  ) {}
 
   async getCheckList(id: number, coupleId: number) {
     const checkList = await this.checkListRepository.getOneById(id);
@@ -51,6 +56,25 @@ export class CheckListService {
       await this.checkListRepository.updateById(id, updateArgs);
     }
 
+    return true;
+  }
+
+  async updateCategoryIdForCheckLists(args: IUpdateCategoryIdForCheckLists) {
+    const { coupleId, checkListIds, categoryId } = args;
+    const checkLists = await this.checkListRepository.getManyByIdsAndCoupleId(
+      checkListIds,
+      coupleId,
+    );
+    if (checkLists.length !== checkListIds.length) {
+      throw new ForbiddenException('수정 권한이 없는 체크리스트가 있습니다.');
+    }
+
+    await this.categoryService.getCategory(categoryId, coupleId);
+
+    await this.checkListRepository.updateCategoryIdByIds(
+      checkListIds,
+      categoryId,
+    );
     return true;
   }
 }
