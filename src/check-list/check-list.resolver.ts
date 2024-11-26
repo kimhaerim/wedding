@@ -6,6 +6,7 @@ import {
   CheckListOutput,
   CheckListsArgs,
   LinkChecklistsToCategoryArgs,
+  RemoveCheckListsByCategoryIdArgs,
   UpdateCheckListArgs,
 } from './dto';
 import { IdArgs } from '../common/dto';
@@ -70,5 +71,26 @@ export class CheckListResolver {
       ...args,
       coupleId: req.coupleId,
     });
+  }
+
+  @Roles(Role.USER)
+  @Mutation(() => Boolean, { description: '체크리스트 삭제' })
+  async removeCheckList(
+    @Args() args: IdArgs,
+    @RequestUser() req: IRequestUser,
+  ) {
+    return this.checkListService.removeCheckList(args.id, req.coupleId);
+  }
+
+  @Roles(Role.USER)
+  @Mutation(() => Boolean, { description: '카테고리에 속한 체크리스트 삭제' })
+  async removeCheckListsByCategoryId(
+    @Args() args: RemoveCheckListsByCategoryIdArgs,
+    @RequestUser() req: IRequestUser,
+  ) {
+    return this.checkListService.removeCheckListsByCategoryId(
+      args.categoryId,
+      req.coupleId,
+    );
   }
 }

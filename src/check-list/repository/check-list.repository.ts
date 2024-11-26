@@ -13,6 +13,10 @@ export class CheckListRepository {
     return this.repository.findOneBy({ id });
   }
 
+  async getManyByCategoryId(categoryId: number, coupleId: number) {
+    return this.repository.find({ where: { categoryId, coupleId } });
+  }
+
   async getManyByIdsAndCoupleId(ids: number[], coupleId: number) {
     return this.repository.find({ where: { id: In(ids), coupleId } });
   }
@@ -43,5 +47,10 @@ export class CheckListRepository {
   async updateCategoryIdByIds(ids: number[], categoryId: number) {
     const updateResult = await this.repository.update(ids, { categoryId });
     return updateResult.affected > 0 ? true : false;
+  }
+
+  async removeByIds(ids: number[]) {
+    const removeResult = await this.repository.delete(ids);
+    return removeResult.affected > 0 ? true : false;
   }
 }

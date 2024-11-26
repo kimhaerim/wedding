@@ -77,4 +77,27 @@ export class CheckListService {
     );
     return true;
   }
+
+  async removeCheckList(id: number, coupleId: number) {
+    const checkList = await this.checkListRepository.getOneById(id);
+    if (checkList.coupleId !== coupleId) {
+      throw new ForbiddenException('삭제 권한이 없는 체크리스트입니다.');
+    }
+
+    return this.checkListRepository.removeByIds([id]);
+  }
+
+  async removeCheckListsByCategoryId(categoryId: number, coupleId: number) {
+    const checkLists = await this.checkListRepository.getManyByCategoryId(
+      categoryId,
+      coupleId,
+    );
+
+    if (checkLists.length === 0) {
+      return true;
+    }
+
+    const ids = checkLists.map((checkList) => checkList.id);
+    return this.checkListRepository.removeByIds(ids);
+  }
 }
