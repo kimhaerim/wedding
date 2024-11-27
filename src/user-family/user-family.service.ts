@@ -15,15 +15,50 @@ import {
 } from './interface';
 import { UserFamilyRepository } from './repository/user-family.repository';
 import { filterValidFields } from '../common/util';
+import { UserFamily } from './entity';
 
 @Injectable()
 export class UserFamilyService {
+  private readonly requiredPersonalField = ['phoneNumber', 'accountNumber'];
   private readonly personalSecret = {
     phoneNumber: config.get<string>('secretForPersonal.phoneNumber'),
     accountNumber: config.get<string>('secretForPersonal.accountNumber'),
   };
 
   constructor(private readonly userFamilyRepository: UserFamilyRepository) {}
+
+  async getUserFamilyByUserId(userId: number) {
+    const userFamily = await this.userFamilyRepository.getManyByUserId(userId);
+    const convertedUserFamily = userFamily.map((family) =>
+      this.convertUserFamilyToOutput(family),
+    );
+
+    const sequence = [
+      Relation.SELF,
+      Relation.FATHER,
+      Relation.MOTHER,
+      Relation.GRANDFATHER,
+      Relation.GRANDMOTHER,
+    ];
+    return convertedUserFamily.sort(
+      (a, b) => sequence.indexOf(a.relation) - sequence.indexOf(b.relation),
+    );
+  }
+
+  private convertUserFamilyToOutput(userFamily: UserFamily) {
+    const accountHolder = userFamily.accountHolder ?? userFamily.name;
+
+    const personalData = {};
+    for (const key of this.requiredPersonalField) {
+      const value = userFamily[key];
+      if (value !== undefined) {
+        const decrypted = this.decryptPersonalData(key, userFamily[key]);
+        personalData[key] = decrypted;
+      }
+    }
+
+    return { ...userFamily, ...personalData, accountHolder };
+  }
 
   async addUserFamily(args: IAddUserFamily) {
     await this.verifyExistingFamily(args.userId, args.relation);
@@ -92,5 +127,14 @@ export class UserFamilyService {
     }
 
     return CryptoJS.AES.encrypt(data, secretKey).toString();
+  }
+
+  private decryptPersonalData(key: string, data: string) {
+    const secretKey = this.personalSecret[key];
+    if (!secretKey) {
+      throw new InternalServerErrorException();
+    }
+
+    return CryptoJS.AES.decrypt(data, secretKey).toString(CryptoJS.enc.Utf8);
   }
 }

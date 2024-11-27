@@ -18,6 +18,10 @@ export class UserFamilyRepository {
     return this.repository.findOneBy({ userId, relation });
   }
 
+  async getManyByUserId(userId: number) {
+    return this.repository.findBy({ userId });
+  }
+
   async add(args: IAdd) {
     return this.repository.save(args);
   }

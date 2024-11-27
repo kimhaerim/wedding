@@ -1,6 +1,10 @@
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 
-import { AddUserFamilyArgs, UpdateUserFamilyArgs } from './dto';
+import {
+  AddUserFamilyArgs,
+  UpdateUserFamilyArgs,
+  UserFamilyOutput,
+} from './dto';
 import { UserFamilyService } from './user-family.service';
 import { Role } from '../common/enum';
 import { RequestUser } from '../common/guard/request-user';
@@ -10,6 +14,12 @@ import { IRequestUser } from '../common/interface';
 @Resolver()
 export class UserFamilyResolver {
   constructor(private readonly userFamilyService: UserFamilyService) {}
+
+  @Roles(Role.USER)
+  @Query(() => [UserFamilyOutput], { description: '가족 전체 조회' })
+  async userFamily(@RequestUser() req: IRequestUser) {
+    return this.userFamilyService.getUserFamilyByUserId(req.userId);
+  }
 
   @Roles(Role.USER)
   @Mutation(() => Boolean, { description: '가족 정보 등록' })
