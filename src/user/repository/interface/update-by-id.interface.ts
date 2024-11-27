@@ -4,4 +4,5 @@ export interface IUpdateById {
   name?: string;
   birthday?: string;
   gender?: Gender;
+  coupleId?: number;
 }

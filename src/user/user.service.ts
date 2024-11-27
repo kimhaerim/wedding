@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { Transactional } from 'typeorm-transactional';
 
-import { IAddUser, IUpdateUserProfile } from './interface';
+import { IAddUser, IUpdateCoupleId, IUpdateUserProfile } from './interface';
 import { UserRepository } from './repository';
 import { filterValidFields } from '../common/util';
 import { CoupleService } from '../couple/couple.service';
@@ -10,6 +10,7 @@ import { CoupleService } from '../couple/couple.service';
 @Injectable()
 export class UserService {
   private readonly hashSalt = 10;
+  private readonly maxCoupleUserCount = 2;
 
   constructor(
     private readonly coupleService: CoupleService,
@@ -35,6 +36,8 @@ export class UserService {
 
   async addUser(args: IAddUser) {
     const { password, coupleId, ...rest } = args;
+    this.verifyCouple(coupleId);
+
     const hashedPassword = password
       ? await bcrypt.hash(password, this.hashSalt)
       : undefined;
@@ -46,11 +49,17 @@ export class UserService {
     });
   }
 
+  private async verifyCouple(coupleId: number) {
+    const coupleUsers = await this.getUsersByCoupleId(coupleId);
+    if (coupleUsers.length >= this.maxCoupleUserCount) {
+      throw new BadRequestException('이미 커플에 두 명의 사용자가 존재합니다.');
+    }
+  }
+
   @Transactional()
   async updateUserProfile(args: IUpdateUserProfile) {
     const { id, name, birthday, gender, weddingDate, coupleStartDate } = args;
     const user = await this.getUserById(id);
-
     await this.coupleService.updateCouple({
       id: user.coupleId,
       weddingDate,
@@ -62,6 +71,15 @@ export class UserService {
       await this.userRepository.updateById(id, { name, birthday, gender });
     }
 
+    return true;
+  }
+
+  @Transactional()
+  async updateCoupleId(args: IUpdateCoupleId) {
+    const { requestCoupleId, userId } = args;
+
+    this.verifyCouple(requestCoupleId);
+    this.userRepository.updateById(userId, { coupleId: requestCoupleId });
     return true;
   }
 }

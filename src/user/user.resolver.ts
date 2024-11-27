@@ -7,7 +7,7 @@ import {
   Resolver,
 } from '@nestjs/graphql';
 
-import { UpdateUserProfileArgs, UserOutput } from './dto';
+import { LinkUserToCoupleArgs, UpdateUserProfileArgs, UserOutput } from './dto';
 import { UserService } from './user.service';
 import { Role } from '../common/enum';
 import { RequestUser } from '../common/guard/request-user';
@@ -31,6 +31,18 @@ export class UserResolver {
     @RequestUser() req: IRequestUser,
   ) {
     return this.userService.updateUserProfile({ ...args, id: req.userId });
+  }
+
+  @Roles(Role.USER)
+  @Mutation(() => Boolean, { description: '커플 연결' })
+  async linkUserToCouple(
+    @Args() args: LinkUserToCoupleArgs,
+    @RequestUser() req: IRequestUser,
+  ) {
+    return this.userService.updateCoupleId({
+      requestCoupleId: args.coupleId,
+      userId: req.userId,
+    });
   }
 
   @ResolveField(() => UserOutput, {

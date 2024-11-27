@@ -14,8 +14,6 @@ import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService {
-  private readonly maxCoupleUserCount = 2;
-
   constructor(
     private readonly coupleService: CoupleService,
     private readonly userService: UserService,
@@ -54,10 +52,6 @@ export class AuthService {
       this.validatePassword(password);
     }
 
-    if (coupleId) {
-      await this.verifyCouple(coupleId);
-    }
-
     const user = coupleId
       ? await this.userService.addUser({ ...args, coupleId })
       : await this.addUserWithCouple(args);
@@ -67,18 +61,6 @@ export class AuthService {
       user.coupleId,
     );
     return { userId: user.id, accessToken, refreshToken };
-  }
-
-  private async verifyCouple(coupleId: number) {
-    const couple = await this.coupleService.getCoupleById(coupleId);
-    if (!couple) {
-      throw new BadRequestException('커플이 존재하지 않습니다.');
-    }
-
-    const coupleUsers = await this.userService.getUsersByCoupleId(coupleId);
-    if (coupleUsers.length >= this.maxCoupleUserCount) {
-      throw new BadRequestException('이미 커플에 두 명의 사용자가 존재합니다.');
-    }
   }
 
   private async addUserWithCouple(args: ISignup) {

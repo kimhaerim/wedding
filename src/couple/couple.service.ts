@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { IAddCouple, IUpdateCouple } from './interface';
 import { CoupleRepository } from './repository';
@@ -9,7 +9,12 @@ export class CoupleService {
   constructor(private readonly coupleRepository: CoupleRepository) {}
 
   async getCoupleById(id: number) {
-    return this.coupleRepository.getManyById(id);
+    const couple = await this.coupleRepository.getOneById(id);
+    if (!couple) {
+      throw new BadRequestException('존재하지 않는 커플입니다.');
+    }
+
+    return couple;
   }
 
   async addCouple(args: IAddCouple) {

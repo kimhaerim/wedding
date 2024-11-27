@@ -5,9 +5,9 @@ export class CoupleOutput {
   @Field(() => Int)
   id: number;
 
-  @Field(() => Int, { nullable: true })
-  weddingDate: Date;
+  @Field(() => Date, { nullable: true })
+  weddingDate?: Date;
 
-  @Field(() => Int, { nullable: true })
-  coupleStartDate: Date;
+  @Field(() => Date, { nullable: true })
+  coupleStartDate?: Date;
 }
