@@ -4,11 +4,13 @@ import {
   Entity,
   Index,
   PrimaryGeneratedColumn,
+  Unique,
 } from 'typeorm';
 
 import { Relation } from '../enum';
 
 @Entity()
+@Unique('userId_relation', ['userId', 'relation'])
 export class UserFamily {
   @PrimaryGeneratedColumn()
   id: number;
