@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
@@ -7,8 +8,13 @@ import * as config from 'config';
 import * as CryptoJS from 'crypto-js';
 
 import { Relation } from './enum';
-import { IAddUserFamily, IGetEncryptedPersonalData } from './interface';
+import {
+  IAddUserFamily,
+  IGetEncryptedPersonalData,
+  IUpdateUserFamily,
+} from './interface';
 import { UserFamilyRepository } from './repository/user-family.repository';
+import { filterValidFields } from '../common/util';
 
 @Injectable()
 export class UserFamilyService {
@@ -40,6 +46,27 @@ export class UserFamilyService {
     if (existingFamily) {
       throw new BadRequestException('이미 등록된 가족입니다.');
     }
+  }
+
+  async updateUserFamily(args: IUpdateUserFamily) {
+    const { phoneNumber, accountNumber, userId, id, ...rest } = args;
+    const userFamily = await this.userFamilyRepository.getOneById(id);
+    if (userFamily.userId !== userId) {
+      throw new ForbiddenException();
+    }
+
+    const encryptedPersonalData = this.getEncryptedPersonalData({
+      phoneNumber,
+      accountNumber,
+    });
+
+    const updateArgs = { ...encryptedPersonalData, ...rest };
+    const familyUpdateArgs = filterValidFields(updateArgs);
+    if (Object.keys(familyUpdateArgs).length > 0) {
+      await this.userFamilyRepository.updateById(id, updateArgs);
+    }
+
+    return true;
   }
 
   private getEncryptedPersonalData(personalData: IGetEncryptedPersonalData) {
