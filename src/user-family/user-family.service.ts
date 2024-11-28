@@ -14,7 +14,7 @@ import {
   IGetEncryptedPersonalData,
   IUpdateUserFamily,
 } from './interface';
-import { UserFamilyRepository } from './repository/user-family.repository';
+import { UserFamilyRepository } from './repository';
 import { filterValidFields } from '../common/util';
 
 @Injectable()
@@ -58,6 +58,15 @@ export class UserFamilyService {
     }
 
     return { ...userFamily, ...personalData, accountHolder };
+  }
+
+  private decryptPersonalData(key: string, data: string) {
+    const secretKey = this.personalSecret[key];
+    if (!secretKey) {
+      throw new InternalServerErrorException();
+    }
+
+    return CryptoJS.AES.decrypt(data, secretKey).toString(CryptoJS.enc.Utf8);
   }
 
   async addUserFamily(args: IAddUserFamily) {
@@ -129,12 +138,12 @@ export class UserFamilyService {
     return CryptoJS.AES.encrypt(data, secretKey).toString();
   }
 
-  private decryptPersonalData(key: string, data: string) {
-    const secretKey = this.personalSecret[key];
-    if (!secretKey) {
-      throw new InternalServerErrorException();
+  async removeUserFamily(id: number, userId: number) {
+    const userFamily = await this.userFamilyRepository.getOneById(id);
+    if (userFamily.userId !== userId) {
+      throw new ForbiddenException();
     }
 
-    return CryptoJS.AES.decrypt(data, secretKey).toString(CryptoJS.enc.Utf8);
+    return this.userFamilyRepository.removeById(id);
   }
 }

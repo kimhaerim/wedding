@@ -30,4 +30,9 @@ export class UserFamilyRepository {
     const updateResult = await this.repository.update(id, updateArgs);
     return updateResult.affected > 0 ? true : false;
   }
+
+  async removeById(id: number) {
+    const removeResult = await this.repository.delete(id);
+    return removeResult.affected > 0 ? true : false;
+  }
 }

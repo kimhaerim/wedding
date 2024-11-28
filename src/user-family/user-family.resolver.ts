@@ -6,6 +6,7 @@ import {
   UserFamilyOutput,
 } from './dto';
 import { UserFamilyService } from './user-family.service';
+import { IdArgs } from '../common/dto';
 import { Role } from '../common/enum';
 import { RequestUser } from '../common/guard/request-user';
 import { Roles } from '../common/guard/roles.decorator';
@@ -43,5 +44,14 @@ export class UserFamilyResolver {
       ...args,
       userId: req.userId,
     });
+  }
+
+  @Roles(Role.USER)
+  @Mutation(() => Boolean, { description: '가족 정보 삭제' })
+  async removeUserFamily(
+    @Args() args: IdArgs,
+    @RequestUser() req: IRequestUser,
+  ) {
+    return this.userFamilyService.removeUserFamily(args.id, req.userId);
   }
 }

@@ -1,9 +1,12 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 
 import { Relation } from '../enum';
 
 @ObjectType()
 export class UserFamilyOutput {
+  @Field(() => Int)
+  id: number;
+
   @Field(() => Relation)
   relation: Relation;
 
