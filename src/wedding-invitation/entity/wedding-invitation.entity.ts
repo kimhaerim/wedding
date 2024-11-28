@@ -21,8 +21,11 @@ export class weddingInvitation {
   @Column('varchar', { length: 255 })
   description: string;
 
-  @Column('varchar', { length: 255, nullable: true })
-  address?: string;
+  @Column('varchar', { length: 255 })
+  address: string;
+
+  @Column('varchar', { length: 255 })
+  detailedAddress: string;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -7,19 +7,26 @@ import {
 } from 'typeorm';
 
 @Entity()
-export class WeddingChat {
+export class WeddingChatMessage {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Index('weddingInvitationId')
+  @Column('varchar', { length: 255 })
+  uuid: string;
+
+  @Index('weddingChatId')
   @Column('int')
-  weddingInvitationId: number;
+  weddingChatId: number;
+
+  @Index('userId')
+  @Column('int', { nullable: true })
+  userId?: number;
 
   @Column('varchar', { length: 255 })
-  title: string;
+  nickname: string;
 
   @Column('varchar', { length: 255 })
-  description: string;
+  message: string;
 
   @CreateDateColumn()
   createdAt: Date;

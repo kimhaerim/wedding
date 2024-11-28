@@ -7,6 +7,7 @@ import {
 import * as config from 'config';
 import * as CryptoJS from 'crypto-js';
 
+import { UserFamily } from './entity';
 import { Relation } from './enum';
 import {
   IAddUserFamily,
@@ -15,7 +16,6 @@ import {
 } from './interface';
 import { UserFamilyRepository } from './repository/user-family.repository';
 import { filterValidFields } from '../common/util';
-import { UserFamily } from './entity';
 
 @Injectable()
 export class UserFamilyService {
