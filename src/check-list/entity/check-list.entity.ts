@@ -3,9 +3,11 @@ import {
   CreateDateColumn,
   Entity,
   Index,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
+import { Cost } from '../../cost/entity';
 import { CheckListStatus } from '../enum';
 
 @Entity()
@@ -38,4 +40,7 @@ export class CheckList {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @OneToMany(() => Cost, (cost) => cost.checkList)
+  costs: Cost[];
 }

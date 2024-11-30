@@ -3,9 +3,12 @@ import {
   CreateDateColumn,
   Entity,
   Index,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
+import { CheckList } from '../../check-list/entity';
 import { CostType } from '../enum';
 
 @Entity()
@@ -31,4 +34,10 @@ export class Cost {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @ManyToOne(() => CheckList, (checkList) => checkList.costs, {
+    createForeignKeyConstraints: false,
+  })
+  @JoinColumn({ name: 'checkListId' })
+  checkList: CheckList;
 }

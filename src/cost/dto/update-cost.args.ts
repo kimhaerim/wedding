@@ -11,14 +11,19 @@ import {
 import { CostType } from '../enum';
 
 @ArgsType()
-export class AddCostArgs {
+export class UpdateCostArgs {
   @Min(1)
   @IsInt()
   @Field(() => Int)
+  id: number;
+
+  @Min(1)
+  @IsInt()
+  @Field(() => Int, { nullable: true })
   checkListId: number;
 
   @IsInt()
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   amount: number;
 
   @IsOptional()
