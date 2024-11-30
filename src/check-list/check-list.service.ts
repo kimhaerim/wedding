@@ -39,10 +39,6 @@ export class CheckListService {
     );
   }
 
-  private convertCheckListToOutput(checkList: CheckList): ICheckListOutput {
-    return { ...checkList, isCompleted: checkList.completedAt ? true : false };
-  }
-
   async getDailyCheckListsByMonth(args: IGetDailyCheckListsByMonth) {
     const dateRange = this.getDateRange(args.targetYear, args.targetMonth);
     const checkLists = await this.checkListRepository.getMany({
@@ -69,6 +65,20 @@ export class CheckListService {
       },
       [],
     );
+  }
+
+  async getCheckListByCategoryId(categoryId: number, coupleId: number) {
+    const checkLists = await this.checkListRepository.getManyByCategoryId(
+      categoryId,
+      coupleId,
+    );
+    return checkLists.map((checkList) =>
+      this.convertCheckListToOutput(checkList),
+    );
+  }
+
+  private convertCheckListToOutput(checkList: CheckList): ICheckListOutput {
+    return { ...checkList, isCompleted: checkList.completedAt ? true : false };
   }
 
   async getCheckListCount(args: IGetCheckListCount) {
@@ -137,7 +147,7 @@ export class CheckListService {
   }
 
   async removeCheckListsByCategoryId(categoryId: number, coupleId: number) {
-    const checkLists = await this.checkListRepository.getManyByCategoryId(
+    const checkLists = await this.getCheckListByCategoryId(
       categoryId,
       coupleId,
     );
