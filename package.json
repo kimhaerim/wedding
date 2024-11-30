@@ -39,6 +39,7 @@
     "class-validator": "^0.14.1",
     "config": "^3.3.12",
     "crypto-js": "^4.2.0",
+    "dataloader": "^2.2.2",
     "dayjs": "^1.11.13",
     "graphql": "^16.9.0",
     "mysql2": "^3.11.2",

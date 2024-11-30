@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Transactional } from 'typeorm-transactional';
 
 import { IAddCost } from './interface';
@@ -12,10 +12,28 @@ export class CostService {
     private readonly costRepository: CostRepository,
   ) {}
 
+  async getCost(id: number, coupleId: number) {
+    const cost = await this.costRepository.getOneById(id);
+    if (!cost) {
+      throw new BadRequestException();
+    }
+
+    await this.getCheckList(cost.checkListId, coupleId);
+    return cost;
+  }
+
+  async getCostsByCheckListId(checkListId: number) {
+    return this.costRepository.getManyByCheckListId(checkListId);
+  }
+
   @Transactional()
   async addCost(args: IAddCost) {
-    await this.checkListService.getCheckList(args.checkListId, args.coupleId);
+    await this.getCheckList(args.checkListId, args.coupleId);
     await this.costRepository.add(args);
     return true;
+  }
+
+  private getCheckList(checkListId: number, coupleId: number) {
+    return this.checkListService.getCheckList(checkListId, coupleId);
   }
 }
