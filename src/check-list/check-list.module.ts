@@ -9,6 +9,7 @@ import { CategoryModule } from '../category/category.module';
 
 @Module({
   imports: [CategoryModule, TypeOrmModule.forFeature([CheckList])],
+  exports: [CheckListService],
   providers: [CheckListResolver, CheckListService, CheckListRepository],
 })
 export class CheckListModule {}

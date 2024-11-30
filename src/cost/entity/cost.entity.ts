@@ -13,9 +13,9 @@ export class Cost {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Index('categoryId')
+  @Index('checkListId')
   @Column('int')
-  categoryId: number;
+  checkListId: number;
 
   @Column('int')
   amount: number;
