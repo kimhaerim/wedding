@@ -3,10 +3,14 @@ import { IsInt, IsOptional, IsString } from 'class-validator';
 
 @ArgsType()
 @InputType()
-export class AddCategoryArgs {
+export class UpdateCategoryArgs {
+  @IsInt()
+  @Field(() => Int)
+  id: number;
+
   @IsString()
-  @Field(() => String)
-  title: string;
+  @Field(() => String, { nullable: true })
+  title?: string;
 
   @IsOptional()
   @IsInt()

@@ -5,6 +5,6 @@ export interface IAdd {
   coupleId: number;
   password?: string;
   name: string;
-  birthDay?: string;
+  birthday?: string;
   gender: Gender;
 }

@@ -12,7 +12,8 @@ export class UserRepository {
   }
 
   async getOneByEmail(email: string) {
-    return this.repository.findOneBy({ email });
+    const user = await this.repository.findOneBy({ email });
+    return user === null ? undefined : user;
   }
 
   async getManyByCoupleId(coupleId: number) {

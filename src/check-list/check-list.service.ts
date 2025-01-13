@@ -34,6 +34,7 @@ export class CheckListService {
 
   async getCheckLists(args: IGetCheckLists) {
     const checkLists = await this.checkListRepository.getMany(args);
+
     return checkLists.map((checkList) =>
       this.convertCheckListToOutput(checkList),
     );
@@ -99,8 +100,8 @@ export class CheckListService {
   }
 
   async addCheckList(args: IAddCheckList) {
-    await this.checkListRepository.add(args);
-    return true;
+    const result = await this.checkListRepository.add(args);
+    return result.id;
   }
 
   async updateCheckList(args: IUpdateCheckList) {

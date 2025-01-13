@@ -9,7 +9,7 @@ export class CostCheckListResolver {
   constructor(private readonly costService: CostService) {}
 
   @ResolveField(() => [CostOutput], { description: '체크리스트 연결된 비용들' })
-  async cost(@Parent() checkList: CheckListOutput) {
+  async costs(@Parent() checkList: CheckListOutput) {
     return this.costService.getCostsByCheckListId(checkList.id);
   }
 }

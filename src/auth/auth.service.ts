@@ -20,6 +20,13 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
+  async existsUser(email: string) {
+    const user = await this.userService
+      .getUserByEmail(email)
+      .catch(() => undefined);
+    return user ? true : false;
+  }
+
   async login(email: string, password: string) {
     const user = await this.userService.getUserByEmail(email);
     if (!user) {
@@ -43,7 +50,9 @@ export class AuthService {
   @Transactional()
   async signup(args: ISignup) {
     const { password, coupleId, ...rest } = args;
-    const existsUser = await this.userService.getUserByEmail(rest.email);
+    const existsUser = await this.userService
+      .getUserByEmail(rest.email)
+      .catch(() => undefined);
     if (existsUser) {
       throw new BadRequestException('이미 가입된 이메일입니다.');
     }

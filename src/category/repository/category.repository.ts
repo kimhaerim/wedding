@@ -2,7 +2,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { Category } from '../entity';
-import { IAdd } from './interface';
+import { IAdd, IUpdateById } from './interface';
 
 export class CategoryRepository {
   constructor(
@@ -17,11 +17,25 @@ export class CategoryRepository {
     return this.repository.findOneBy({ title, coupleId });
   }
 
-  async getManyByCoupleId(coupleId: number) {
-    return this.repository.findBy({ coupleId });
+  async getManyByCoupleId(args: {
+    coupleId: number;
+    offset: number;
+    limit: number;
+  }) {
+    return this.repository.find({
+      where: { coupleId: args.coupleId },
+      skip: args.offset,
+      take: args.limit,
+    });
   }
 
-  async add(args: IAdd) {
-    return this.repository.save(args);
+  async add(args: IAdd[]) {
+    const insertResult = await this.repository.insert(args);
+    return insertResult.identifiers.map((data) => data.id);
+  }
+
+  async updateById(id: number, updateArgs: IUpdateById) {
+    const updateResult = await this.repository.update(id, updateArgs);
+    return updateResult.affected > 0 ? true : false;
   }
 }

@@ -5,7 +5,7 @@ export interface ISignup {
   password?: string;
   name: string;
   gender: Gender;
-  birthDay?: string;
+  birthday?: string;
   coupleId?: number;
   weddingDate?: Date;
   coupleStartDate?: string;

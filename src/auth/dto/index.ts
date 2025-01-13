@@ -1,3 +1,4 @@
+export * from './exists-user.args';
 export * from './login.args';
 export * from './signup.args';
 export * from './signup.output';

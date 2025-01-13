@@ -30,9 +30,23 @@ export class CheckListRepository {
   }
 
   async getMany(args: IGetMany) {
-    const { coupleId, isCompleted, startDate, endDate, orderBy, orderOption } =
-      args;
+    const {
+      coupleId,
+      categoryId,
+      isCompleted,
+      startDate,
+      endDate,
+      orderBy,
+      orderOption,
+      offset,
+      limit,
+    } = args;
+
     const builder = this.createBaseQuery(coupleId);
+
+    if (categoryId) {
+      builder.andWhere('checkList.categoryId = :categoryId', { categoryId });
+    }
 
     if (isCompleted !== undefined) {
       const condition = isCompleted ? 'IS NOT NULL' : 'IS NULL';
@@ -50,7 +64,7 @@ export class CheckListRepository {
       this.applyOrderBy({ builder, orderBy, orderOption });
     }
 
-    return builder.getMany();
+    return builder.skip(offset).take(limit).getMany();
   }
 
   private applyOrderBy(args: IApplyOrderBy) {

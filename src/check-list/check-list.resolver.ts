@@ -1,4 +1,4 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { CheckListService } from './check-list.service';
 import {
@@ -13,7 +13,7 @@ import {
   RemoveCheckListsByCategoryIdArgs,
   UpdateCheckListArgs,
 } from './dto';
-import { IdArgs } from '../common/dto';
+import { IdArgs, PaginationArgs } from '../common/dto';
 import { Role } from '../common/enum';
 import { RequestUser } from '../common/guard/request-user';
 import { Roles } from '../common/guard/roles.decorator';
@@ -33,10 +33,12 @@ export class CheckListResolver {
   @Query(() => [CheckListOutput], { description: '체크리스트 목록 조회' })
   async checkLists(
     @Args() args: CheckListsArgs,
+    @Args() paginationArgs: PaginationArgs,
     @RequestUser() req: IRequestUser,
   ) {
     return this.checkListService.getCheckLists({
       ...args,
+      ...paginationArgs,
       coupleId: req.coupleId,
     });
   }
@@ -68,7 +70,7 @@ export class CheckListResolver {
   }
 
   @Roles(Role.USER)
-  @Mutation(() => Boolean, { description: '체크리스트 저장' })
+  @Mutation(() => Int, { description: '체크리스트 저장' })
   async addCheckList(
     @Args() args: AddCheckListArgs,
     @RequestUser() req: IRequestUser,

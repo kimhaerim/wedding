@@ -31,7 +31,7 @@ export class SignupArgs {
   @IsOptional()
   @IsDateString()
   @Field({ nullable: true })
-  birthDay?: string;
+  birthday?: string;
 
   @Field(() => Gender)
   gender: Gender;
