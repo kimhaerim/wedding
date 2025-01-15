@@ -17,14 +17,27 @@ export class UpdateCostArgs {
   @Field(() => Int)
   id: number;
 
+  @IsOptional()
+  @IsString()
+  @Field(() => String, { nullable: true })
+  title?: string;
+
+  @IsOptional()
   @Min(1)
   @IsInt()
   @Field(() => Int, { nullable: true })
-  checkListId: number;
+  categoryId?: number;
 
+  @IsOptional()
+  @Min(1)
   @IsInt()
   @Field(() => Int, { nullable: true })
-  amount: number;
+  checkListId?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Field(() => Int, { nullable: true })
+  amount?: number;
 
   @IsOptional()
   @IsDateString()
@@ -36,7 +49,8 @@ export class UpdateCostArgs {
   @Field(() => String, { nullable: true })
   memo?: string;
 
+  @IsOptional()
   @IsEnum(CostType)
   @Field(() => CostType, { nullable: true })
-  costType: CostType;
+  costType?: CostType;
 }

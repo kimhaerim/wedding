@@ -1,4 +1,4 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { CostService } from './cost.service';
 import { AddCostArgs, CostOutput, UpdateCostArgs } from './dto';
@@ -19,7 +19,7 @@ export class CostResolver {
   }
 
   @Roles(Role.USER)
-  @Mutation(() => Boolean, { description: '비용 추가' })
+  @Mutation(() => Int, { description: '비용 추가' })
   async addCost(@Args() args: AddCostArgs, @RequestUser() req: IRequestUser) {
     return this.costService.addCost({ ...args, coupleId: req.coupleId });
   }

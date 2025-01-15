@@ -12,10 +12,21 @@ import { CostType } from '../enum';
 
 @ArgsType()
 export class AddCostArgs {
+  @IsString()
+  @Field(() => String)
+  title: string;
+
+  @IsOptional()
   @Min(1)
   @IsInt()
-  @Field(() => Int)
-  checkListId: number;
+  @Field(() => Int, { nullable: true })
+  categoryId?: number;
+
+  @IsOptional()
+  @Min(1)
+  @IsInt()
+  @Field(() => Int, { nullable: true })
+  checkListId?: number;
 
   @IsInt()
   @Field(() => Int)
@@ -23,8 +34,8 @@ export class AddCostArgs {
 
   @IsOptional()
   @IsDateString()
-  @Field(() => Date, { nullable: true })
-  paymentDate?: Date;
+  @Field({ nullable: true })
+  paymentDate?: string;
 
   @IsOptional()
   @IsString()
@@ -32,6 +43,6 @@ export class AddCostArgs {
   memo?: string;
 
   @IsEnum(CostType)
-  @Field(() => CostType, { nullable: true })
+  @Field(() => CostType)
   costType: CostType;
 }

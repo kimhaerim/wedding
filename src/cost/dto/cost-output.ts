@@ -5,6 +5,12 @@ import { CostType } from '../enum';
 @ObjectType()
 export class CostOutput {
   @Field(() => Int)
+  id: number;
+
+  @Field(() => String)
+  title: string;
+
+  @Field(() => Int)
   amount: number;
 
   @Field(() => String, { nullable: true })

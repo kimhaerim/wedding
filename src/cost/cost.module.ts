@@ -7,9 +7,10 @@ import { CostService } from './cost.service';
 import { Cost } from './entity';
 import { CostRepository } from './repository';
 import { CheckListModule } from '../check-list/check-list.module';
+import { CategoryModule } from '../category/category.module';
 
 @Module({
-  imports: [CheckListModule, TypeOrmModule.forFeature([Cost])],
+  imports: [CategoryModule, CheckListModule, TypeOrmModule.forFeature([Cost])],
   providers: [CostResolver, CostCheckListResolver, CostService, CostRepository],
 })
 export class CostModule {}

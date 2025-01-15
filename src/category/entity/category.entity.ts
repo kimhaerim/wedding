@@ -3,9 +3,12 @@ import {
   CreateDateColumn,
   Entity,
   Index,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
+
+import { Cost } from '../../cost/entity';
 
 @Unique('title_couple_id', ['title', 'coupleId'])
 @Entity()
@@ -25,4 +28,7 @@ export class Category {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @OneToMany(() => Cost, (cost) => cost.category)
+  costs: Cost[];
 }

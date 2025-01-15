@@ -1,10 +1,12 @@
 import { CostType } from '../enum';
 
 export interface IAddCost {
-  checkListId: number;
+  title: string;
+  categoryId?: number;
+  checkListId?: number;
   coupleId: number;
   amount: number;
-  paymentDate?: Date;
+  paymentDate?: string;
   memo?: string;
   costType: CostType;
 }
