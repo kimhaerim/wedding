@@ -3,10 +3,13 @@ import {
   CreateDateColumn,
   Entity,
   Index,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
+import { Category } from '../../category/entity';
 import { Cost } from '../../cost/entity';
 import { CheckListStatus } from '../enum';
 
@@ -40,6 +43,12 @@ export class CheckList {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @ManyToOne(() => Category, (category) => category.checkList, {
+    createForeignKeyConstraints: false,
+  })
+  @JoinColumn({ name: 'categoryId' })
+  category: Category;
 
   @OneToMany(() => Cost, (cost) => cost.checkList)
   costs: Cost[];

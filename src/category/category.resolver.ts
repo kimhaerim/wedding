@@ -1,14 +1,28 @@
-import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Int,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 
 import { CategoryService } from './category.service';
-import { AddCategoryArgs, CategoryOutput, UpdateCategoryArgs } from './dto';
+import {
+  AddCategoryArgs,
+  CategoryBudgetDetailsOutput,
+  CategoryOutput,
+  TotalCategoryBudgetArgs,
+  UpdateCategoryArgs,
+} from './dto';
 import { IdArgs, PaginationArgs } from '../common/dto';
 import { Role } from '../common/enum';
 import { RequestUser } from '../common/guard/request-user';
 import { Roles } from '../common/guard/roles.decorator';
 import { IRequestUser } from '../common/interface';
 
-@Resolver()
+@Resolver(CategoryOutput)
 export class CategoryResolver {
   constructor(private readonly categoryService: CategoryService) {}
 
@@ -26,6 +40,20 @@ export class CategoryResolver {
   ) {
     return this.categoryService.getCategories({
       ...paginationArgs,
+      coupleId: req.coupleId,
+    });
+  }
+
+  @Roles(Role.USER)
+  @Query(() => CategoryBudgetDetailsOutput, {
+    description: '예산 / 지출 내역 조회',
+  })
+  async totalCategoryBudget(
+    @Args() args: TotalCategoryBudgetArgs,
+    @RequestUser() req: IRequestUser,
+  ) {
+    return this.categoryService.getTotalCategoryBudget({
+      ...args,
       coupleId: req.coupleId,
     });
   }
@@ -60,6 +88,21 @@ export class CategoryResolver {
   ) {
     return this.categoryService.updateCategory({
       ...args,
+      coupleId: req.coupleId,
+    });
+  }
+
+  @Roles(Role.USER)
+  @ResolveField(() => CategoryBudgetDetailsOutput, {
+    description: '카테고리 별 예산/지출 내역',
+    nullable: true,
+  })
+  async categoryBudgetDetails(
+    @Parent() category: CategoryOutput,
+    @RequestUser() req: IRequestUser,
+  ) {
+    return this.categoryService.getCategoryBudgetDetails({
+      id: category.id,
       coupleId: req.coupleId,
     });
   }

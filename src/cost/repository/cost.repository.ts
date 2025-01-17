@@ -3,7 +3,7 @@ import * as DataLoader from 'dataloader';
 import { In, Repository } from 'typeorm';
 
 import { Cost } from '../entity';
-import { IAdd, IUpdateById } from './interface';
+import { IAdd, IGetMany, IUpdateById } from './interface';
 
 export class CostRepository {
   constructor(@InjectRepository(Cost) private repository: Repository<Cost>) {}
@@ -33,6 +33,24 @@ export class CostRepository {
 
   async getManyByCheckListId(checkListId: number) {
     return this.loader.load(checkListId);
+  }
+
+  async getMany(args: IGetMany) {
+    const { startDate, endDate, coupleId } = args;
+    const builder = this.repository.createQueryBuilder('cost');
+    builder
+      .leftJoin('cost.checkList', 'checkList')
+      .leftJoin('cost.category', 'category')
+      .where(
+        '(checkList.coupleId = :coupleId OR category.coupleId = :coupleId)',
+        { coupleId },
+      );
+    builder
+      .andWhere('cost.paymentDate IS NOT NULL')
+      .andWhere('cost.paymentDate >= :startDate', { startDate })
+      .andWhere('cost.paymentDate < :endDate', { endDate });
+
+    return builder.getMany();
   }
 
   async add(args: IAdd) {

@@ -3,13 +3,19 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
+import * as dayjs from 'dayjs';
 import { Transactional } from 'typeorm-transactional';
 
-import { IAddCost, IUpdateCost } from './interface';
+import {
+  IAddCost,
+  ICostOutput,
+  IGetDailyCheckListsByMonth,
+  IUpdateCost,
+} from './interface';
 import { CostRepository } from './repository';
+import { CategoryService } from '../category/category.service';
 import { CheckListService } from '../check-list/check-list.service';
 import { filterValidFields } from '../common/util';
-import { CategoryService } from '../category/category.service';
 
 @Injectable()
 export class CostService {
@@ -38,6 +44,33 @@ export class CostService {
 
   async getCostsByCheckListId(checkListId: number) {
     return this.costRepository.getManyByCheckListId(checkListId);
+  }
+
+  async getDailyCostsByMonth(args: IGetDailyCheckListsByMonth) {
+    const { targetYear, targetMonth, coupleId } = args;
+    const format = 'YYYY-MM-DD';
+    const startDate = dayjs(`${targetYear}-${targetMonth}-1`).format(format);
+    const endDate = dayjs(`${targetYear}-${targetMonth + 1}-1`).format(format);
+
+    const costs = await this.costRepository.getMany({
+      startDate,
+      endDate,
+      coupleId,
+    });
+    return costs.reduce(
+      (acc: { paymentDate: string; costs: ICostOutput[] }[], cost) => {
+        const paymentDate = dayjs(cost.paymentDate).format('YYYY-MM-DD');
+        const found = acc.find((data) => data.paymentDate === paymentDate);
+        if (found) {
+          found.costs.push(cost);
+        } else {
+          acc.push({ paymentDate, costs: [cost] });
+        }
+
+        return acc;
+      },
+      [],
+    );
   }
 
   @Transactional()

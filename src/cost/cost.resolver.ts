@@ -1,7 +1,13 @@
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { CostService } from './cost.service';
-import { AddCostArgs, CostOutput, UpdateCostArgs } from './dto';
+import {
+  AddCostArgs,
+  CostOutput,
+  DailyCostsByMonthArgs,
+  DailyCostsByMonthOutput,
+  UpdateCostArgs,
+} from './dto';
 import { IdArgs } from '../common/dto';
 import { Role } from '../common/enum';
 import { RequestUser } from '../common/guard/request-user';
@@ -16,6 +22,20 @@ export class CostResolver {
   @Query(() => CostOutput)
   async cost(@Args() args: IdArgs, @RequestUser() req: IRequestUser) {
     return this.costService.getCost(args.id, req.coupleId);
+  }
+
+  @Roles(Role.USER)
+  @Query(() => [DailyCostsByMonthOutput], {
+    description: '날짜 별로 지출내역 목록 조회',
+  })
+  async dailyCostsByMonth(
+    @Args() args: DailyCostsByMonthArgs,
+    @RequestUser() req: IRequestUser,
+  ) {
+    return this.costService.getDailyCostsByMonth({
+      ...args,
+      coupleId: req.coupleId,
+    });
   }
 
   @Roles(Role.USER)
