@@ -1,5 +1,3 @@
-import { CheckListStatus } from '../enum';
-
 export interface IAddCheckList {
   coupleId: number;
   categoryId?: number;
@@ -7,5 +5,4 @@ export interface IAddCheckList {
   reservedDate?: Date;
   completedAt?: string;
   memo?: string;
-  status?: CheckListStatus;
 }

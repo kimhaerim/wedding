@@ -1,7 +1,5 @@
 import { ArgsType, Field, Int } from '@nestjs/graphql';
-import { IsDate, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
-
-import { CheckListStatus } from '../enum';
+import { IsDate, IsInt, IsOptional, IsString } from 'class-validator';
 
 @ArgsType()
 export class AddCheckListArgs {
@@ -28,9 +26,4 @@ export class AddCheckListArgs {
   @IsString()
   @Field(() => String, { nullable: true })
   memo?: string;
-
-  @IsOptional()
-  @IsEnum(CheckListStatus)
-  @Field(() => CheckListStatus, { nullable: true })
-  status?: CheckListStatus;
 }

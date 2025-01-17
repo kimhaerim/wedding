@@ -35,10 +35,6 @@ export class CostService {
       await this.getCheckList(cost.checkListId, coupleId);
     }
 
-    if (cost.categoryId) {
-      await this.getCategory(cost.categoryId, coupleId);
-    }
-
     return cost;
   }
 

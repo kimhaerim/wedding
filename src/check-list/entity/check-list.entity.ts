@@ -11,7 +11,6 @@ import {
 
 import { Category } from '../../category/entity';
 import { Cost } from '../../cost/entity';
-import { CheckListStatus } from '../enum';
 
 @Entity()
 export class CheckList {
@@ -23,8 +22,8 @@ export class CheckList {
   coupleId: number;
 
   @Index('categoryId')
-  @Column('int', { nullable: true })
-  categoryId?: number;
+  @Column('int')
+  categoryId: number;
 
   @Column('varchar', { length: 255 })
   description: string;
@@ -37,9 +36,6 @@ export class CheckList {
 
   @Column('varchar', { length: 255, nullable: true })
   memo?: string;
-
-  @Column('enum', { enum: CheckListStatus, nullable: true })
-  status?: CheckListStatus;
 
   @CreateDateColumn()
   createdAt: Date;

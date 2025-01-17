@@ -9,7 +9,6 @@ import {
 } from 'typeorm';
 
 import { CheckList } from '../../check-list/entity';
-import { Cost } from '../../cost/entity';
 
 @Unique('title_couple_id', ['title', 'coupleId'])
 @Entity()
@@ -29,9 +28,6 @@ export class Category {
 
   @CreateDateColumn()
   createdAt: Date;
-
-  @OneToMany(() => Cost, (cost) => cost.category)
-  costs: Cost[];
 
   @OneToMany(() => CheckList, (checkList) => checkList.category)
   checkList: CheckList[];
