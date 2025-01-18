@@ -32,7 +32,7 @@ export class CategoryRepository {
   ) {}
 
   async getOneById(id: number) {
-    return this.repository.findOneBy({ id });
+    return this.repository.findOne({ where: { id } });
   }
 
   async getOneByTitleAndCoupleId(title: string, coupleId: number) {
@@ -103,6 +103,7 @@ export class CategoryRepository {
         'SUM(costs.amount) AS totalCost',
         'SUM(CASE WHEN costs.paymentDate IS NULL OR costs.paymentDate >= CURDATE() THEN costs.amount ELSE 0 END) AS paidCost',
       ])
+      .andWhere('costs.isIncludeBudget = 1')
       .andWhere('category.coupleId = :coupleId', { coupleId })
       .andWhere('category.id IN (:...ids)', { ids })
       .groupBy('category.id');

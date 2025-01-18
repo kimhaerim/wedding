@@ -15,6 +15,7 @@ import {
 import { CheckListRepository } from './repository';
 import { CategoryService } from '../category/category.service';
 import { filterValidFields } from '../common/util';
+import { Transactional } from 'typeorm-transactional';
 
 @Injectable()
 export class CheckListService {
@@ -99,6 +100,7 @@ export class CheckListService {
     return { startDate, endDate };
   }
 
+  @Transactional()
   async addCheckList(args: IAddCheckList) {
     const category = await this.categoryService
       .getCategory(args.categoryId, args.coupleId)
@@ -111,6 +113,7 @@ export class CheckListService {
     return result.id;
   }
 
+  @Transactional()
   async updateCheckList(args: IUpdateCheckList) {
     const { id, ...updateArgs } = args;
     const checkList = await this.checkListRepository.getOneById(id);
@@ -118,11 +121,13 @@ export class CheckListService {
       throw new ForbiddenException('수정 권한이 없는 체크리스트입니다.');
     }
 
-    const category = await this.categoryService
-      .getCategory(args.categoryId, args.coupleId)
-      .catch(() => undefined);
-    if (!category) {
-      throw new ForbiddenException('권한이 없는 카테고리입니다.');
+    if (args.categoryId) {
+      const category = await this.categoryService
+        .getCategory(args.categoryId, args.coupleId)
+        .catch(() => undefined);
+      if (!category) {
+        throw new ForbiddenException('권한이 없는 카테고리입니다.');
+      }
     }
 
     const checkListUpdateArgs = filterValidFields(updateArgs);
