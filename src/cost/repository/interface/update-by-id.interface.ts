@@ -8,4 +8,5 @@ export interface IUpdateById {
   paymentDate?: Date;
   memo?: string;
   costType?: CostType;
+  isIncludeBudget?: boolean;
 }

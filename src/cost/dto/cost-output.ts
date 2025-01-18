@@ -19,6 +19,9 @@ export class CostOutput {
   @Field(() => String, { nullable: true })
   memo?: string;
 
-  @Field(() => CostType, { nullable: true })
+  @Field(() => CostType)
   costType: CostType;
+
+  @Field(() => Boolean)
+  isIncludeBudget: boolean;
 }

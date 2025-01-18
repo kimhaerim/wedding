@@ -47,6 +47,7 @@ export class CategoryResolver {
   @Roles(Role.USER)
   @Query(() => CategoryBudgetDetailsOutput, {
     description: '예산 / 지출 내역 조회',
+    nullable: true,
   })
   async totalCategoryBudget(
     @Args() args: TotalCategoryBudgetArgs,

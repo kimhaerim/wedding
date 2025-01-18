@@ -1,5 +1,6 @@
 import { ArgsType, Field, Int } from '@nestjs/graphql';
 import {
+  IsBoolean,
   IsDateString,
   IsEnum,
   IsInt,
@@ -22,17 +23,10 @@ export class UpdateCostArgs {
   @Field(() => String, { nullable: true })
   title?: string;
 
-  @IsOptional()
   @Min(1)
   @IsInt()
-  @Field(() => Int, { nullable: true })
-  categoryId?: number;
-
-  @IsOptional()
-  @Min(1)
-  @IsInt()
-  @Field(() => Int, { nullable: true })
-  checkListId?: number;
+  @Field(() => Int)
+  checkListId: number;
 
   @IsOptional()
   @IsInt()
@@ -53,4 +47,9 @@ export class UpdateCostArgs {
   @IsEnum(CostType)
   @Field(() => CostType, { nullable: true })
   costType?: CostType;
+
+  @IsOptional()
+  @IsBoolean()
+  @Field(() => Boolean, { nullable: true })
+  isIncludeBudget?: boolean;
 }

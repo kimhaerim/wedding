@@ -8,5 +8,6 @@ export interface IAdd {
   amount: number;
   paymentDate?: string;
   memo?: string;
-  costType: CostType;
+  costType?: CostType;
+  isIncludeBudget?: boolean;
 }

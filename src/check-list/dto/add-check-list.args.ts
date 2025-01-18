@@ -5,8 +5,8 @@ import { IsDate, IsInt, IsOptional, IsString } from 'class-validator';
 export class AddCheckListArgs {
   @IsOptional()
   @IsInt()
-  @Field(() => Int, { nullable: true })
-  categoryId?: number;
+  @Field(() => Int)
+  categoryId: number;
 
   @IsString()
   @Field(() => String)

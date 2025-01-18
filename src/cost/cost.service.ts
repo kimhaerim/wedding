@@ -13,14 +13,12 @@ import {
   IUpdateCost,
 } from './interface';
 import { CostRepository } from './repository';
-import { CategoryService } from '../category/category.service';
 import { CheckListService } from '../check-list/check-list.service';
 import { filterValidFields } from '../common/util';
 
 @Injectable()
 export class CostService {
   constructor(
-    private readonly categoryService: CategoryService,
     private readonly checkListService: CheckListService,
     private readonly costRepository: CostRepository,
   ) {}
@@ -71,23 +69,14 @@ export class CostService {
 
   @Transactional()
   async addCost(args: IAddCost) {
-    const { checkListId, categoryId, coupleId } = args;
-    if (!checkListId && !categoryId) {
-      throw new BadRequestException('카테고리는 필수입니다.');
-    }
-
-    if (checkListId) {
-      await this.getCheckList(checkListId, coupleId);
-    }
-
-    if (categoryId) {
-      await this.getCategory(categoryId, coupleId);
-    }
+    const { checkListId, coupleId } = args;
+    await this.getCheckList(checkListId, coupleId);
 
     const result = await this.costRepository.add(args);
     return result.id;
   }
 
+  @Transactional()
   async updateCost(args: IUpdateCost) {
     const { id, coupleId, ...updateArgs } = args;
     await this.verifyCostWithCheckList(id, coupleId);
@@ -108,10 +97,6 @@ export class CostService {
 
   private getCheckList(checkListId: number, coupleId: number) {
     return this.checkListService.getCheckList(checkListId, coupleId);
-  }
-
-  private getCategory(categoryId: number, coupleId: number) {
-    return this.categoryService.getCategory(categoryId, coupleId);
   }
 
   private async verifyCostWithCheckList(id: number, coupleId: number) {

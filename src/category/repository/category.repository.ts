@@ -65,6 +65,7 @@ export class CategoryRepository {
         'SUM(CASE WHEN costs.paymentDate IS NULL OR costs.paymentDate >= CURDATE() THEN costs.amount ELSE 0 END) AS paidCost',
       ])
       .andWhere('category.coupleId = :coupleId', { coupleId })
+      .andWhere('costs.isIncludeBudget = 1')
       .groupBy('category.coupleId');
 
     if (startDate && endDate) {

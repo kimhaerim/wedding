@@ -1,6 +1,6 @@
 export interface IAddCheckList {
   coupleId: number;
-  categoryId?: number;
+  categoryId: number;
   description: string;
   reservedDate?: Date;
   completedAt?: string;

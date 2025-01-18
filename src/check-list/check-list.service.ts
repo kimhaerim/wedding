@@ -100,6 +100,13 @@ export class CheckListService {
   }
 
   async addCheckList(args: IAddCheckList) {
+    const category = await this.categoryService
+      .getCategory(args.categoryId, args.coupleId)
+      .catch(() => undefined);
+    if (!category) {
+      throw new ForbiddenException('권한이 없는 카테고리입니다.');
+    }
+
     const result = await this.checkListRepository.add(args);
     return result.id;
   }
@@ -109,6 +116,13 @@ export class CheckListService {
     const checkList = await this.checkListRepository.getOneById(id);
     if (checkList?.coupleId !== args.coupleId) {
       throw new ForbiddenException('수정 권한이 없는 체크리스트입니다.');
+    }
+
+    const category = await this.categoryService
+      .getCategory(args.categoryId, args.coupleId)
+      .catch(() => undefined);
+    if (!category) {
+      throw new ForbiddenException('권한이 없는 카테고리입니다.');
     }
 
     const checkListUpdateArgs = filterValidFields(updateArgs);
@@ -129,7 +143,12 @@ export class CheckListService {
       throw new ForbiddenException('수정 권한이 없는 체크리스트가 있습니다.');
     }
 
-    await this.categoryService.getCategory(categoryId, coupleId);
+    const category = await this.categoryService
+      .getCategory(args.categoryId, args.coupleId)
+      .catch(() => undefined);
+    if (!category) {
+      throw new ForbiddenException('권한이 없는 카테고리입니다.');
+    }
 
     await this.checkListRepository.updateCategoryIdByIds(
       checkListIds,

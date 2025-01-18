@@ -40,7 +40,7 @@ export class CostRepository {
     const builder = this.repository.createQueryBuilder('cost');
     builder
       .leftJoin('cost.checkList', 'checkList')
-      .leftJoin('cost.category', 'category')
+      .leftJoin('checkList.category', 'category')
       .where(
         '(checkList.coupleId = :coupleId OR category.coupleId = :coupleId)',
         { coupleId },
