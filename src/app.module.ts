@@ -8,6 +8,7 @@ import { addTransactionalDataSource } from 'typeorm-transactional';
 
 import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
+import { CategoryReadModule } from './category/category-read.module';
 import { CategoryModule } from './category/category.module';
 import { CheckListModule } from './check-list/check-list.module';
 import { JwtAuthGuard } from './common/guard/jwt-auth.guard';
@@ -44,6 +45,7 @@ import { WeddingInvitationModule } from './wedding-invitation/wedding-invitation
     }),
     AuthModule,
     CategoryModule,
+    CategoryReadModule,
     CheckListModule,
     CostModule,
     CoupleModule,

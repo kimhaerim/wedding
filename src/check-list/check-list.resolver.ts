@@ -1,4 +1,12 @@
-import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Int,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 
 import { CheckListService } from './check-list.service';
 import {
@@ -13,13 +21,14 @@ import {
   RemoveCheckListsByCategoryIdArgs,
   UpdateCheckListArgs,
 } from './dto';
+import { CategoryOutput } from '../category/dto';
 import { IdArgs, PaginationArgs } from '../common/dto';
 import { Role } from '../common/enum';
 import { RequestUser } from '../common/guard/request-user';
 import { Roles } from '../common/guard/roles.decorator';
 import { IRequestUser } from '../common/interface';
 
-@Resolver()
+@Resolver(CheckListOutput)
 export class CheckListResolver {
   constructor(private readonly checkListService: CheckListService) {}
 
@@ -114,14 +123,27 @@ export class CheckListResolver {
     return this.checkListService.removeCheckList(args.id, req.coupleId);
   }
 
-  @Roles(Role.USER)
-  @Mutation(() => Boolean, { description: '카테고리에 속한 체크리스트 삭제' })
-  async removeCheckListsByCategoryId(
-    @Args() args: RemoveCheckListsByCategoryIdArgs,
+  // @Roles(Role.USER)
+  // @Mutation(() => Boolean, { description: '카테고리에 속한 체크리스트 삭제' })
+  // async removeCheckListsByCategoryId(
+  //   @Args() args: RemoveCheckListsByCategoryIdArgs,
+  //   @RequestUser() req: IRequestUser,
+  // ) {
+  //   return this.checkListService.removeCheckListsByCategoryId(
+  //     args.categoryId,
+  //     req.coupleId,
+  //   );
+  // }
+
+  @ResolveField(() => CategoryOutput, {
+    description: '체크리스트의 부모 카테고리',
+  })
+  async categoryByCheckList(
+    @Parent() checkList: CheckListOutput,
     @RequestUser() req: IRequestUser,
   ) {
-    return this.checkListService.removeCheckListsByCategoryId(
-      args.categoryId,
+    return this.checkListService.getCategoryByCheckList(
+      checkList.id,
       req.coupleId,
     );
   }

@@ -1,5 +1,6 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import * as dayjs from 'dayjs';
+import { Transactional } from 'typeorm-transactional';
 
 import { CheckList } from './entity';
 import {
@@ -13,14 +14,13 @@ import {
   IUpdateCheckList,
 } from './interface';
 import { CheckListRepository } from './repository';
-import { CategoryService } from '../category/category.service';
-import { filterValidFields } from '../common/util';
-import { Transactional } from 'typeorm-transactional';
+import { CategoryReadService } from '../category/category-read.service';
+import { filterValidFields, getDateRange } from '../common/util';
 
 @Injectable()
 export class CheckListService {
   constructor(
-    private readonly categoryService: CategoryService,
+    private readonly categoryReadService: CategoryReadService,
     private readonly checkListRepository: CheckListRepository,
   ) {}
 
@@ -41,8 +41,17 @@ export class CheckListService {
     );
   }
 
+  async getCategoryByCheckList(id: number, coupleId: number) {
+    const checkList = await this.checkListRepository.getOneById(id);
+    if (!checkList) {
+      return undefined;
+    }
+
+    return this.categoryReadService.getCategory(checkList.categoryId, coupleId);
+  }
+
   async getDailyCheckListsByMonth(args: IGetDailyCheckListsByMonth) {
-    const dateRange = this.getDateRange(args.targetYear, args.targetMonth);
+    const dateRange = getDateRange(args.targetYear, args.targetMonth);
     const checkLists = await this.checkListRepository.getMany({
       ...args,
       ...dateRange,
@@ -85,24 +94,13 @@ export class CheckListService {
 
   async getCheckListCount(args: IGetCheckListCount) {
     const { targetYear, targetMonth, coupleId } = args;
-    const dateRange = this.getDateRange(targetYear, targetMonth);
+    const dateRange = getDateRange(targetYear, targetMonth);
     return this.checkListRepository.getCount({ ...dateRange, coupleId });
-  }
-
-  private getDateRange(targetYear?: number, targetMonth?: number) {
-    if (!targetYear || !targetMonth) {
-      return { startDate: undefined, endDate: undefined };
-    }
-
-    const format = 'YYYY-MM-DD';
-    const startDate = dayjs(`${targetYear}-${targetMonth}-1`).format(format);
-    const endDate = dayjs(`${targetYear}-${targetMonth + 1}-1`).format(format);
-    return { startDate, endDate };
   }
 
   @Transactional()
   async addCheckList(args: IAddCheckList) {
-    const category = await this.categoryService
+    const category = await this.categoryReadService
       .getCategory(args.categoryId, args.coupleId)
       .catch(() => undefined);
     if (!category) {
@@ -122,7 +120,7 @@ export class CheckListService {
     }
 
     if (args.categoryId) {
-      const category = await this.categoryService
+      const category = await this.categoryReadService
         .getCategory(args.categoryId, args.coupleId)
         .catch(() => undefined);
       if (!category) {
@@ -148,7 +146,7 @@ export class CheckListService {
       throw new ForbiddenException('수정 권한이 없는 체크리스트가 있습니다.');
     }
 
-    const category = await this.categoryService
+    const category = await this.categoryReadService
       .getCategory(args.categoryId, args.coupleId)
       .catch(() => undefined);
     if (!category) {
@@ -162,26 +160,23 @@ export class CheckListService {
     return true;
   }
 
+  @Transactional()
   async removeCheckList(id: number, coupleId: number) {
-    const checkList = await this.checkListRepository.getOneById(id);
-    if (checkList.coupleId !== coupleId) {
+    const checkList = await this.checkListRepository.getOneWithCost(id);
+    if (checkList?.coupleId !== coupleId) {
       throw new ForbiddenException('삭제 권한이 없는 체크리스트입니다.');
     }
 
-    return this.checkListRepository.removeByIds([id]);
-  }
-
-  async removeCheckListsByCategoryId(categoryId: number, coupleId: number) {
-    const checkLists = await this.getCheckListByCategoryId(
-      categoryId,
-      coupleId,
-    );
-
-    if (checkLists.length === 0) {
-      return true;
+    const costIds = checkList.costs.map((cost) => cost.id);
+    if (costIds.length) {
+      // 비용삭제
     }
 
-    const ids = checkLists.map((checkList) => checkList.id);
+    await this.checkListRepository.removeByIds([id]);
+    return true;
+  }
+
+  async removeCheckLists(ids: number[]) {
     return this.checkListRepository.removeByIds(ids);
   }
 }

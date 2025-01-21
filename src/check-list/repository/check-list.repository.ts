@@ -1,4 +1,5 @@
 import { InjectRepository } from '@nestjs/typeorm';
+import * as DataLoader from 'dataloader';
 import { In, Repository } from 'typeorm';
 
 import { CheckList } from '../entity';
@@ -17,8 +18,24 @@ export class CheckListRepository {
     @InjectRepository(CheckList) private repository: Repository<CheckList>,
   ) {}
 
+  private loader = new DataLoader<number, CheckList | undefined>(
+    async (ids: number[]) => {
+      const result = await this.repository.findBy({ id: In(ids) });
+      return ids.map((id) => result.find((data) => data.id === id));
+    },
+    { cache: false },
+  );
+
   async getOneById(id: number) {
-    return this.repository.findOneBy({ id });
+    return this.loader.load(id);
+  }
+
+  async getOneWithCost(id: number) {
+    return this.repository
+      .createQueryBuilder('checkList')
+      .leftJoinAndSelect('checkList.costs', 'costs')
+      .where('checkList.id = :id', { id })
+      .getOne();
   }
 
   async getManyByCategoryId(categoryId: number, coupleId: number) {
@@ -117,16 +134,16 @@ export class CheckListRepository {
 
   async updateById(id: number, updateArgs: IUpdateById) {
     const updateResult = await this.repository.update(id, updateArgs);
-    return updateResult.affected > 0 ? true : false;
+    return updateResult.affected ? true : false;
   }
 
   async updateCategoryIdByIds(ids: number[], categoryId: number) {
     const updateResult = await this.repository.update(ids, { categoryId });
-    return updateResult.affected > 0 ? true : false;
+    return updateResult.affected ? true : false;
   }
 
   async removeByIds(ids: number[]) {
     const removeResult = await this.repository.delete(ids);
-    return removeResult.affected > 0 ? true : false;
+    return removeResult.affected ? true : false;
   }
 }

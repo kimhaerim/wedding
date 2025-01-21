@@ -26,6 +26,6 @@ export class UserRepository {
 
   async updateById(id: number, updateArgs: IUpdateById) {
     const updateResult = await this.repository.update(id, updateArgs);
-    return updateResult.affected > 0 ? true : false;
+    return updateResult.affected ? true : false;
   }
 }

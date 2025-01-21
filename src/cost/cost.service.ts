@@ -92,7 +92,11 @@ export class CostService {
   @Transactional()
   async removeCost(id: number, coupleId: number) {
     await this.verifyCostWithCheckList(id, coupleId);
-    return this.costRepository.removeById(id);
+    return this.costRepository.removeByIds([id]);
+  }
+
+  async removeCostsByIds(ids: number[]) {
+    return this.costRepository.removeByIds(ids);
   }
 
   private getCheckList(checkListId: number, coupleId: number) {

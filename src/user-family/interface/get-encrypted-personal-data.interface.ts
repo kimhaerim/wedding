@@ -1,4 +1,4 @@
 export interface IGetEncryptedPersonalData {
-  phoneNumber: string;
-  accountNumber: string;
+  phoneNumber?: string;
+  accountNumber?: string;
 }

@@ -95,7 +95,7 @@ export class UserFamilyService {
   async updateUserFamily(args: IUpdateUserFamily) {
     const { phoneNumber, accountNumber, userId, id, ...rest } = args;
     const userFamily = await this.userFamilyRepository.getOneById(id);
-    if (userFamily.userId !== userId) {
+    if (userFamily?.userId !== userId) {
       throw new ForbiddenException();
     }
 
@@ -140,7 +140,7 @@ export class UserFamilyService {
 
   async removeUserFamily(id: number, userId: number) {
     const userFamily = await this.userFamilyRepository.getOneById(id);
-    if (userFamily.userId !== userId) {
+    if (userFamily?.userId !== userId) {
       throw new ForbiddenException();
     }
 

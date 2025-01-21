@@ -6,10 +6,10 @@ import { CheckListResolver } from './check-list.resolver';
 import { CheckListService } from './check-list.service';
 import { CheckList } from './entity';
 import { CheckListRepository } from './repository';
-import { CategoryModule } from '../category/category.module';
+import { CategoryReadModule } from '../category/category-read.module';
 
 @Module({
-  imports: [CategoryModule, TypeOrmModule.forFeature([CheckList])],
+  imports: [CategoryReadModule, TypeOrmModule.forFeature([CheckList])],
   exports: [CheckListService],
   providers: [
     CheckListResolver,

@@ -10,7 +10,7 @@ export class CoupleRepository {
     @InjectRepository(Couple) private repository: Repository<Couple>,
   ) {}
 
-  async getOneById(id: number): Promise<Couple> {
+  async getOneById(id: number) {
     return this.repository.findOneBy({ id });
   }
 
@@ -20,6 +20,6 @@ export class CoupleRepository {
 
   async updateById(id: number, updateArgs: IUpdateById) {
     const updateResult = await this.repository.update(id, updateArgs);
-    return updateResult.affected > 0 ? true : false;
+    return updateResult.affected ? true : false;
   }
 }

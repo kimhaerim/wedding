@@ -1,12 +1,13 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import * as DataLoader from 'dataloader';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 import { Category } from '../entity';
 import {
   IAdd,
   IGetBudgetSumOutput,
   IGetCategoryBudgetDetails,
+  IGetManyByCoupleId,
   IGetTotalCategoryBudget,
   IUpdateById,
 } from './interface';
@@ -27,27 +28,40 @@ export class CategoryRepository {
     { cache: false },
   );
 
+  private categoryLoader = new DataLoader<number, Category | undefined>(
+    async (ids: number[]) => {
+      const result = await this.repository.findBy({ id: In(ids) });
+      return ids.map((id) => result.find((data) => data.id === id));
+    },
+    { cache: false },
+  );
+
   constructor(
     @InjectRepository(Category) private repository: Repository<Category>,
   ) {}
 
   async getOneById(id: number) {
-    return this.repository.findOne({ where: { id } });
+    return this.categoryLoader.load(id);
   }
 
   async getOneByTitleAndCoupleId(title: string, coupleId: number) {
     return this.repository.findOneBy({ title, coupleId });
   }
 
-  async getManyByCoupleId(args: {
-    coupleId: number;
-    offset: number;
-    limit: number;
-  }) {
+  async getOneWithCheckLists(id: number) {
+    const builder = this.repository
+      .createQueryBuilder('category')
+      .leftJoinAndSelect('category.checkList', 'checkList')
+      .leftJoinAndSelect('checkList.costs', 'costs');
+    return builder.andWhere('category.id = :id', { id }).getOne();
+  }
+
+  async getManyByCoupleId(args: IGetManyByCoupleId) {
+    const { coupleId, offset, limit } = args;
     return this.repository.find({
-      where: { coupleId: args.coupleId },
-      skip: args.offset,
-      take: args.limit,
+      where: { coupleId },
+      skip: offset,
+      take: limit,
     });
   }
 
@@ -55,7 +69,9 @@ export class CategoryRepository {
     return this.loader.load(args);
   }
 
-  async getTotalCategoryBudget(args: IGetTotalCategoryBudget) {
+  async getTotalCategoryBudget(
+    args: IGetTotalCategoryBudget,
+  ): Promise<IGetBudgetSumOutput | undefined> {
     const { coupleId, startDate, endDate } = args;
     const builder = this.createBaseBuilderAndJoin();
     builder
@@ -84,7 +100,12 @@ export class CategoryRepository {
 
   async updateById(id: number, updateArgs: IUpdateById) {
     const updateResult = await this.repository.update(id, updateArgs);
-    return updateResult.affected > 0 ? true : false;
+    return updateResult.affected ? true : false;
+  }
+
+  async removeById(id: number) {
+    const removeResult = await this.repository.delete(id);
+    return removeResult.affected ? true : false;
   }
 
   private createBaseBuilderAndJoin() {

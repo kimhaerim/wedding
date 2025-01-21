@@ -59,12 +59,12 @@ export class CostRepository {
 
   async updateById(id: number, updateArgs: IUpdateById) {
     const updateResult = await this.repository.update(id, updateArgs);
-    return updateResult.affected > 0 ? true : false;
+    return updateResult.affected ? true : false;
   }
 
-  async removeById(id: number) {
-    const removeResult = await this.repository.delete(id);
-    return removeResult.affected > 0 ? true : false;
+  async removeByIds(ids: number[]) {
+    const removeResult = await this.repository.delete(ids);
+    return removeResult.affected ? true : false;
   }
 
   private getManyByCheckListIds(checkListIds: number[]) {

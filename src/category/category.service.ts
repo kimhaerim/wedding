@@ -3,72 +3,23 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
-import * as dayjs from 'dayjs';
 import { Transactional } from 'typeorm-transactional';
 
-import { IAddCategory, IGetTotalCategoryBudget } from './interface';
+import { CategoryReadService } from './category-read.service';
+import { IAddCategories, IAddCategory, IUpdateCategory } from './interface';
 import { CategoryRepository } from './repository';
+import { CheckListService } from '../check-list/check-list.service';
 import { filterValidFields } from '../common/util';
-import { IGetCategories } from './repository/interface';
+import { CostService } from '../cost/cost.service';
 
 @Injectable()
 export class CategoryService {
-  constructor(private readonly categoryRepository: CategoryRepository) {}
-
-  async getCategory(id: number, coupleId: number) {
-    const category = await this.categoryRepository.getOneById(id);
-    if (category.coupleId !== coupleId) {
-      throw new ForbiddenException('조회 권한이 없는 카테고리입니다.');
-    }
-
-    return category;
-  }
-
-  async getCategories(args: IGetCategories) {
-    return this.categoryRepository.getManyByCoupleId(args);
-  }
-
-  async getTotalCategoryBudget(args: IGetTotalCategoryBudget) {
-    const { coupleId, targetYear, targetMonth } = args;
-    const dateRange = this.getDateRange(targetYear, targetMonth);
-    const result = await this.categoryRepository.getTotalCategoryBudget({
-      coupleId,
-      ...dateRange,
-    });
-    if (!result) {
-      return undefined;
-    }
-
-    return {
-      ...result,
-      remainingBudget: result.budgetAmount - result.totalCost,
-      unpaidCost: result.totalCost - result.paidCost,
-    };
-  }
-
-  private getDateRange(targetYear?: number, targetMonth?: number) {
-    if (!targetYear || !targetMonth) {
-      return { startDate: undefined, endDate: undefined };
-    }
-
-    const format = 'YYYY-MM-DD';
-    const startDate = dayjs(`${targetYear}-${targetMonth}-1`).format(format);
-    const endDate = dayjs(`${targetYear}-${targetMonth + 1}-1`).format(format);
-    return { startDate, endDate };
-  }
-
-  async getCategoryBudgetDetails(args: { id: number; coupleId: number }) {
-    const result = await this.categoryRepository.getCategoryBudgetDetails(args);
-    if (!result) {
-      return undefined;
-    }
-
-    return {
-      ...result,
-      remainingBudget: result.budgetAmount - result.totalCost,
-      unpaidCost: result.totalCost - result.paidCost,
-    };
-  }
+  constructor(
+    private readonly categoryReadService: CategoryReadService,
+    private readonly checkListService: CheckListService,
+    private readonly costService: CostService,
+    private readonly categoryRepository: CategoryRepository,
+  ) {}
 
   @Transactional()
   async addCategory(args: IAddCategory) {
@@ -85,32 +36,43 @@ export class CategoryService {
   }
 
   @Transactional()
-  async addCategories(
-    args: { title: string; budgetAmount?: number }[],
-    coupleId: number,
-  ) {
+  async addCategories(args: IAddCategories[], coupleId: number) {
     const addArgs = args.map((arg) => ({ ...arg, coupleId }));
     await this.categoryRepository.add(addArgs);
     return true;
   }
 
-  async updateCategory(args: {
-    id: number;
-    coupleId: number;
-    title?: string;
-    budgetAmount?: number;
-  }) {
+  async updateCategory(args: IUpdateCategory) {
     const { id, ...updateArgs } = args;
-    const checkList = await this.categoryRepository.getOneById(id);
-    if (checkList?.coupleId !== args.coupleId) {
-      throw new ForbiddenException('수정 권한이 없는 체크리스트입니다.');
-    }
-
+    await this.categoryReadService.getCategory(id, args.coupleId);
     const categoryUpdateArgs = filterValidFields(updateArgs);
     if (Object.keys(categoryUpdateArgs).length > 0) {
       await this.categoryRepository.updateById(id, updateArgs);
     }
 
+    return true;
+  }
+
+  @Transactional()
+  async removeCategoryById(id: number, coupleId: number) {
+    const category = await this.categoryRepository.getOneWithCheckLists(id);
+    if (category?.coupleId !== coupleId) {
+      throw new ForbiddenException('권한이 없는 카테고리입니다.');
+    }
+
+    const checkListIds = category.checkList?.map((data) => data.id);
+    if (checkListIds?.length) {
+      await this.checkListService.removeCheckLists(checkListIds);
+    }
+
+    const costIds = category.checkList?.flatMap((data) =>
+      data.costs?.map((cost) => cost.id),
+    );
+    if (costIds?.length) {
+      await this.costService.removeCostsByIds(costIds);
+    }
+
+    await this.categoryRepository.removeById(id);
     return true;
   }
 }

@@ -10,6 +10,7 @@ import { CheckListModule } from '../check-list/check-list.module';
 
 @Module({
   imports: [CheckListModule, TypeOrmModule.forFeature([Cost])],
+  exports: [CostService],
   providers: [CostResolver, CostCheckListResolver, CostService, CostRepository],
 })
 export class CostModule {}

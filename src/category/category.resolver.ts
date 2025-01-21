@@ -8,6 +8,7 @@ import {
   Resolver,
 } from '@nestjs/graphql';
 
+import { CategoryReadService } from './category-read.service';
 import { CategoryService } from './category.service';
 import {
   AddCategoryArgs,
@@ -24,12 +25,15 @@ import { IRequestUser } from '../common/interface';
 
 @Resolver(CategoryOutput)
 export class CategoryResolver {
-  constructor(private readonly categoryService: CategoryService) {}
+  constructor(
+    private readonly categoryService: CategoryService,
+    private readonly categoryReadService: CategoryReadService,
+  ) {}
 
   @Roles(Role.USER)
   @Query(() => CategoryOutput, { description: '카테고리 단일 조회' })
   async category(@Args() args: IdArgs, @RequestUser() req: IRequestUser) {
-    return this.categoryService.getCategory(args.id, req.coupleId);
+    return this.categoryReadService.getCategory(args.id, req.coupleId);
   }
 
   @Roles(Role.USER)
@@ -38,7 +42,7 @@ export class CategoryResolver {
     @Args() paginationArgs: PaginationArgs,
     @RequestUser() req: IRequestUser,
   ) {
-    return this.categoryService.getCategories({
+    return this.categoryReadService.getCategories({
       ...paginationArgs,
       coupleId: req.coupleId,
     });
@@ -53,7 +57,7 @@ export class CategoryResolver {
     @Args() args: TotalCategoryBudgetArgs,
     @RequestUser() req: IRequestUser,
   ) {
-    return this.categoryService.getTotalCategoryBudget({
+    return this.categoryReadService.getTotalCategoryBudget({
       ...args,
       coupleId: req.coupleId,
     });
@@ -94,6 +98,12 @@ export class CategoryResolver {
   }
 
   @Roles(Role.USER)
+  @Mutation(() => Boolean, { description: '카테고리 삭제' })
+  async removeCategory(@Args() args: IdArgs, @RequestUser() req: IRequestUser) {
+    return this.categoryService.removeCategoryById(args.id, req.coupleId);
+  }
+
+  @Roles(Role.USER)
   @ResolveField(() => CategoryBudgetDetailsOutput, {
     description: '카테고리 별 예산/지출 내역',
     nullable: true,
@@ -102,9 +112,9 @@ export class CategoryResolver {
     @Parent() category: CategoryOutput,
     @RequestUser() req: IRequestUser,
   ) {
-    return this.categoryService.getCategoryBudgetDetails({
-      id: category.id,
-      coupleId: req.coupleId,
-    });
+    return this.categoryReadService.getCategoryBudgetDetails(
+      category.id,
+      req.coupleId,
+    );
   }
 }
