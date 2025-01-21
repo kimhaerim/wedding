@@ -6,6 +6,8 @@ import { Category } from './entity';
 import { CategoryRepository } from './repository';
 import { budgetSumMockData, categoryMockData } from '../../test/mock/data';
 import { MockCategoryRepository } from '../../test/mock/repository';
+import { CategoriesOrderBy } from './enum';
+import { OrderOption } from '../common/enum';
 
 describe('CategoryReadService', () => {
   let service: CategoryReadService;
@@ -75,13 +77,21 @@ describe('CategoryReadService', () => {
       const coupleId = 1;
       const offset = 0;
       const limit = 10;
+      const orderBy = CategoriesOrderBy.CREATED_AT;
+      const orderOption = OrderOption.DESC;
 
       jest
         .spyOn(categoryRepository, 'getManyByCoupleId')
         .mockResolvedValue([categoryMockData]);
 
       // when
-      const result = await service.getCategories({ coupleId, offset, limit });
+      const result = await service.getCategories({
+        coupleId,
+        offset,
+        limit,
+        orderBy,
+        orderOption,
+      });
 
       // then
       expect(categoryRepository.getManyByCoupleId).toHaveBeenCalledTimes(1);
@@ -89,6 +99,8 @@ describe('CategoryReadService', () => {
         coupleId,
         offset,
         limit,
+        orderBy,
+        orderOption,
       });
       expect(result).toEqual([categoryMockData]);
     });

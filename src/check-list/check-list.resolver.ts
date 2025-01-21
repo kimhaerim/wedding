@@ -18,7 +18,6 @@ import {
   DailyCheckListByMonthArgs,
   DailyCheckListByMonthOutput,
   LinkChecklistsToCategoryArgs,
-  RemoveCheckListsByCategoryIdArgs,
   UpdateCheckListArgs,
 } from './dto';
 import { CategoryOutput } from '../category/dto';

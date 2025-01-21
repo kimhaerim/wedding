@@ -12,6 +12,7 @@ import { CategoryReadService } from './category-read.service';
 import { CategoryService } from './category.service';
 import {
   AddCategoryArgs,
+  CategoriesArgs,
   CategoryBudgetDetailsOutput,
   CategoryOutput,
   TotalCategoryBudgetArgs,
@@ -39,10 +40,12 @@ export class CategoryResolver {
   @Roles(Role.USER)
   @Query(() => [CategoryOutput], { description: '카테고리 목록 조회' })
   async categories(
+    @Args() categoriesArgs: CategoriesArgs,
     @Args() paginationArgs: PaginationArgs,
     @RequestUser() req: IRequestUser,
   ) {
     return this.categoryReadService.getCategories({
+      ...categoriesArgs,
       ...paginationArgs,
       coupleId: req.coupleId,
     });

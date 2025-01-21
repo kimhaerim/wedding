@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import * as DataLoader from 'dataloader';
-import { In, Repository } from 'typeorm';
+import { In, Repository, SelectQueryBuilder } from 'typeorm';
 
 import { Category } from '../entity';
 import {
@@ -11,6 +11,8 @@ import {
   IGetTotalCategoryBudget,
   IUpdateById,
 } from './interface';
+import { OrderOption } from '../../common/enum';
+import { CategoriesOrderBy } from '../enum';
 
 export class CategoryRepository {
   private loader = new DataLoader<
@@ -57,12 +59,28 @@ export class CategoryRepository {
   }
 
   async getManyByCoupleId(args: IGetManyByCoupleId) {
-    const { coupleId, offset, limit } = args;
-    return this.repository.find({
-      where: { coupleId },
-      skip: offset,
-      take: limit,
-    });
+    const { coupleId, offset, limit, orderBy, orderOption } = args;
+    const builder = this.repository
+      .createQueryBuilder('category')
+      .where('category.coupleId = :coupleId', { coupleId })
+      .offset(offset)
+      .limit(limit);
+    if (orderBy && orderOption) {
+      this.buildOrder(builder, orderBy, orderOption);
+    }
+
+    return builder.getMany();
+  }
+
+  private buildOrder(
+    builder: SelectQueryBuilder<Category>,
+    orderBy: CategoriesOrderBy,
+    orderOption: OrderOption,
+  ) {
+    switch (orderBy) {
+      case CategoriesOrderBy.CREATED_AT:
+        return builder.orderBy('id', orderOption);
+    }
   }
 
   async getCategoryBudgetDetails(args: IGetCategoryBudgetDetails) {
