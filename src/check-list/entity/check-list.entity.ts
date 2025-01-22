@@ -40,7 +40,7 @@ export class CheckList {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => Category, (category) => category.checkList, {
+  @ManyToOne(() => Category, (category) => category.checkLists, {
     createForeignKeyConstraints: false,
   })
   @JoinColumn({ name: 'categoryId' })

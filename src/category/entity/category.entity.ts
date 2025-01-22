@@ -30,5 +30,5 @@ export class Category {
   createdAt: Date;
 
   @OneToMany(() => CheckList, (checkList) => checkList.category)
-  checkList: CheckList[];
+  checkLists: CheckList[];
 }

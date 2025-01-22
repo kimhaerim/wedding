@@ -176,7 +176,7 @@ export class CheckListService {
     return true;
   }
 
-  async removeCheckLists(ids: number[]) {
+  async removeCheckListsByIds(ids: number[]) {
     return this.checkListRepository.removeByIds(ids);
   }
 }

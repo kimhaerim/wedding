@@ -43,8 +43,8 @@ export class CategoryService {
   }
 
   async updateCategory(args: IUpdateCategory) {
-    const { id, ...updateArgs } = args;
-    await this.categoryReadService.getCategory(id, args.coupleId);
+    const { id, coupleId, ...updateArgs } = args;
+    await this.categoryReadService.getCategory(id, coupleId);
     const categoryUpdateArgs = filterValidFields(updateArgs);
     if (Object.keys(categoryUpdateArgs).length > 0) {
       await this.categoryRepository.updateById(id, updateArgs);
@@ -60,12 +60,12 @@ export class CategoryService {
       throw new ForbiddenException('권한이 없는 카테고리입니다.');
     }
 
-    const checkListIds = category.checkList?.map((data) => data.id);
+    const checkListIds = category.checkLists?.map((data) => data.id);
     if (checkListIds?.length) {
-      await this.checkListService.removeCheckLists(checkListIds);
+      await this.checkListService.removeCheckListsByIds(checkListIds);
     }
 
-    const costIds = category.checkList?.flatMap((data) =>
+    const costIds = category.checkLists?.flatMap((data) =>
       data.costs?.map((cost) => cost.id),
     );
     if (costIds?.length) {

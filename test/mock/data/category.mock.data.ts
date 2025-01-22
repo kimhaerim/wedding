@@ -6,5 +6,5 @@ export const categoryMockData: Readonly<Category> = Object.freeze<Category>({
   title: '카테고리',
   budgetAmount: 0,
   createdAt: new Date(),
-  checkList: [],
+  checkLists: [],
 });

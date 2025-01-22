@@ -3,10 +3,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { CategoryReadService } from './category-read.service';
 import { Category } from './entity';
+import { CategoriesOrderBy } from './enum';
 import { CategoryRepository } from './repository';
 import { budgetSumMockData, categoryMockData } from '../../test/mock/data';
 import { MockCategoryRepository } from '../../test/mock/repository';
-import { CategoriesOrderBy } from './enum';
 import { OrderOption } from '../common/enum';
 
 describe('CategoryReadService', () => {

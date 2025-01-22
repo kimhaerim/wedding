@@ -53,8 +53,8 @@ export class CategoryRepository {
   async getOneWithCheckLists(id: number) {
     const builder = this.repository
       .createQueryBuilder('category')
-      .leftJoinAndSelect('category.checkList', 'checkList')
-      .leftJoinAndSelect('checkList.costs', 'costs');
+      .leftJoinAndSelect('category.checkLists', 'checkLists')
+      .leftJoinAndSelect('checkLists.costs', 'costs');
     return builder.andWhere('category.id = :id', { id }).getOne();
   }
 
@@ -129,8 +129,8 @@ export class CategoryRepository {
   private createBaseBuilderAndJoin() {
     return this.repository
       .createQueryBuilder('category')
-      .innerJoin('category.checkList', 'checkList')
-      .innerJoin('checkList.costs', 'costs');
+      .innerJoin('category.checkLists', 'checkLists')
+      .innerJoin('checkLists.costs', 'costs');
   }
 
   private async getBudgetSum(ids: number[], coupleId: number) {
