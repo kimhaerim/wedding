@@ -29,15 +29,19 @@ export class CostService {
       throw new BadRequestException();
     }
 
-    if (cost.checkListId) {
-      await this.getCheckList(cost.checkListId, coupleId);
+    const checkList = await this.checkListService
+      .getCheckList(cost.checkListId, coupleId)
+      .catch(() => undefined);
+
+    if (!checkList) {
+      throw new ForbiddenException();
     }
 
     return cost;
   }
 
-  async getCostsByCheckListId(checkListId: number) {
-    return this.costRepository.getManyByCheckListId(checkListId);
+  async getCostsByCheckListId(checkListId: number, coupleId: number) {
+    return this.costRepository.getManyByCheckListId(checkListId, coupleId);
   }
 
   async getDailyCostsByMonth(args: IGetDailyCheckListsByMonth) {
@@ -69,11 +73,16 @@ export class CostService {
 
   @Transactional()
   async addCost(args: IAddCost) {
-    const { checkListId, coupleId } = args;
-    await this.getCheckList(checkListId, coupleId);
+    const { checkListId, coupleId, ...addArgs } = args;
+    const checkList = await this.checkListService
+      .getCheckList(checkListId, coupleId)
+      .catch(() => undefined);
 
-    const result = await this.costRepository.add(args);
-    return result.id;
+    if (!checkList) {
+      throw new ForbiddenException();
+    }
+
+    return this.costRepository.add({ ...addArgs, checkListId });
   }
 
   @Transactional()
@@ -97,10 +106,6 @@ export class CostService {
 
   async removeCostsByIds(ids: number[]) {
     return this.costRepository.removeByIds(ids);
-  }
-
-  private getCheckList(checkListId: number, coupleId: number) {
-    return this.checkListService.getCheckList(checkListId, coupleId);
   }
 
   private async verifyCostWithCheckList(id: number, coupleId: number) {

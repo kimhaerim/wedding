@@ -1,19 +1,28 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import * as DataLoader from 'dataloader';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 
 import { Cost } from '../entity';
-import { IAdd, IGetMany, IUpdateById } from './interface';
+import {
+  IAdd,
+  IGetMany,
+  IGetManyByCheckListId,
+  IUpdateById,
+} from './interface';
 
 export class CostRepository {
   constructor(@InjectRepository(Cost) private repository: Repository<Cost>) {}
 
-  private loader = new DataLoader<number, Cost[]>(
-    async (checkListIds: number[]) => {
-      const costs = await this.getManyByCheckListIds(checkListIds);
+  private loader = new DataLoader<IGetManyByCheckListId, Cost[]>(
+    async (args: IGetManyByCheckListId[]) => {
+      const uniqueCheckListIds = args.map((arg) => arg.checkListId);
+      const costs = await this.getManyByCheckListIds(
+        uniqueCheckListIds,
+        args[0].coupleId,
+      );
 
-      return checkListIds.map((checkListId) =>
-        costs.filter((cost) => cost.checkListId === checkListId),
+      return args.map((arg) =>
+        costs.filter((cost) => cost.checkListId === arg.checkListId),
       );
     },
     { cache: false },
@@ -31,8 +40,8 @@ export class CostRepository {
       .getOne();
   }
 
-  async getManyByCheckListId(checkListId: number) {
-    return this.loader.load(checkListId);
+  async getManyByCheckListId(checkListId: number, coupleId: number) {
+    return this.loader.load({ checkListId, coupleId });
   }
 
   async getMany(args: IGetMany) {
@@ -54,7 +63,8 @@ export class CostRepository {
   }
 
   async add(args: IAdd) {
-    return this.repository.save(args);
+    const insertResult = await this.repository.save(args);
+    return insertResult.id;
   }
 
   async updateById(id: number, updateArgs: IUpdateById) {
@@ -67,7 +77,12 @@ export class CostRepository {
     return removeResult.affected ? true : false;
   }
 
-  private getManyByCheckListIds(checkListIds: number[]) {
-    return this.repository.findBy({ checkListId: In(checkListIds) });
+  private getManyByCheckListIds(checkListIds: number[], coupleId: number) {
+    const builder = this.repository
+      .createQueryBuilder('cost')
+      .leftJoin('cost.checkList', 'checkList')
+      .where('checkList.coupleId = :coupleId', { coupleId })
+      .andWhere('cost.checkListId IN (:...checkListIds)', { checkListIds });
+    return builder.getMany();
   }
 }
